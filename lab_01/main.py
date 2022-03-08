@@ -1,10 +1,11 @@
-import tkinter as tk
-import os
 import graphics_math as gm
 import itertools as it
+import os
+import tkinter as tk
 import tkinter.messagebox as tmb
 
 from tkinter import ttk
+
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 450
@@ -15,15 +16,49 @@ CANVAS_HEIGHT = 450
 CURRENT_SET = 1
 
 
+def parse_coordinate(string: str) -> list:
+    flag = True
+
+    try:
+        result = list(map(float, string.split(', ')))
+    except ValueError:
+        flag = False
+
+    if flag:
+        return result
+
+    flag = True
+
+    try:
+        result = list(map(float, string.split('; ')))
+    except ValueError:
+        flag = False
+    
+    if flag:
+        return result
+
+    flag = True
+
+    try:
+        result = list(map(float, string.split(' ')))
+    except ValueError:
+        flag = False
+
+    if not flag:
+        return [None]
+
+    return result
+
+
 def add_coordinates():
     if CURRENT_SET == 1:
         tree = table_1
     else:
         tree = table_2
 
-    try:
-        coordinates = list(map(float, add_entry.get().split(', ')))
-    except ValueError:
+    coordinates = parse_coordinate(add_entry.get())
+    
+    if coordinates[0] is None:
         tmb.showerror(title='Ошибка!', message='Некорректный тип данных!')
         return
 
@@ -33,6 +68,10 @@ def add_coordinates():
 
     if coordinates not in tree.get_children():
         tree.insert('', tk.END, values=coordinates)
+
+
+def enter_handler(event):
+    add_coordinates()
 
 
 def delete_coordinates():
@@ -94,12 +133,12 @@ def solve():
 
     if len(initial_set_1) < 3:
         tmb.showerror(title='Ошибка!', message='Введено менее трех '
-                                                         'координат первого множества.')
+                      'координат первого множества.')
         return
 
     if len(initial_set_2) < 3:
         tmb.showerror(title='Ошибка!', message='Введено менее трех '
-                                                         'координат второго множества.')
+                      'координат второго множества.')
         return
 
     solution_found = False
@@ -125,14 +164,14 @@ def solve():
             circle_center_2 = gm.get_circle_center(coordinates_2)
 
             if circle_center_1[0] is None:
-                log_file.write(f'Circles {coordinates_1} does not exits.\n')
-                continue
+                log_file.write('Окружность с координатами '
+                f'{coordinates_1} не может быть построена.\n')
+                continue 
 
             if circle_center_2[0] is None:
-                log_file.write(f'Circles {coordinates_2} does not exits.\n')
+                log_file.write('Окружность с координатами '
+                f'{coordinates_1} не может быть построена.\n')
                 continue
-
-            solution_found = True
 
             radius_1 = gm.get_circle_radius(coordinates_1)
             radius_2 = gm.get_circle_radius(coordinates_2)
@@ -141,11 +180,15 @@ def solve():
                 gm.get_tangent_coordinates(circle_center_1, radius_1,
                                            circle_center_2, radius_2)
 
-            print(rectangle_coordinates)
+            if rectangle_coordinates[0] is None:
+                print('DBG')
+                continue
 
             current_area = gm.get_rectangle_area(
                 [circle_center_1, circle_center_2,
                  rectangle_coordinates[:2], rectangle_coordinates[2:4]])
+
+            solution_found = True
 
             log_file.write(f'Area is {current_area} for circles '
                            f'{coordinates_1} and {coordinates_2}.\n')
@@ -165,7 +208,7 @@ def solve():
 
     if not solution_found:
         tmb.showinfo(title='Результат.',
-                               message='Решение не может быть найдено.')
+                     message='Решение не может быть найдено.')
         return
 
     gm.draw_axes(main_canvas, CANVAS_WIDTH, CANVAS_HEIGHT)
@@ -198,20 +241,19 @@ def solve():
                    f'{result_coordinates_1} and {result_coordinates_2}.\n')
 
     tk.messagebox.showinfo(title='Результат.',
-                           message=f'Самая большая площадь {result_area} для '
-                                   f'окружностей {result_coordinates_1} и '
-                                   f'{result_coordinates_2}.')
+                           message=f'Самая большая площадь четырехугольника - {result_area} '
+                                   f'для окружностей {result_coordinates_1} и f{result_coordinates_2}.')
 
 
 try:
-    log_file = open('logs\\log.txt', 'w')
+    log_file = open('logs/log.txt', 'w')
 except FileNotFoundError:
     os.system('mkdir logs')
-    log_file = open('logs\\log.txt', 'w')
+    log_file = open('logs/log.txt', 'w')
 
 main_form = tk.Tk()
 main_form.title('Лабораторная работа #1')
-main_form.geometry(f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}+1100+300')
+main_form.geometry(f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}+400+300')
 main_form.resizable(width=False, height=False)
 
 style = ttk.Style()
@@ -243,21 +285,22 @@ table_2.heading('y', text='Y')
 vsb_2 = ttk.Scrollbar(main_form, orient="vertical", command=table_2.yview)
 table_2.configure(yscrollcommand=vsb_2.set)
 
-add_entry = tk.Entry(font=15, width=22, justify='center', relief='sunken')
+add_entry = tk.Entry(font=15, width=20, justify='center', relief='sunken')
 add_entry.place(x=20, y=40)
+add_entry.bind('<Return>', enter_handler)
 
-add_button = tk.Button(text='Добавить точку', command=add_coordinates, width=27)
+add_button = tk.Button(text='Добавить точку', command=add_coordinates, width=23)
 add_button.place(x=20, y=70)
 
 delete_button = tk.Button(text='Удалить точку', command=delete_coordinates,
-                          width=27)
+                          width=23)
 delete_button.place(x=20, y=100)
 
-read_button = tk.Button(text='Получить решение', command=solve, width=27)
+read_button = tk.Button(text='Получить решение', command=solve, width=23)
 read_button.place(x=20, y=130)
 
 change_set_button = tk.Button(text='Редактировать 2-е множество',
-                              command=change_set, width=27)
+                              command=change_set, width=23)
 change_set_button.place(x=20, y=160)
 
 main_form.mainloop()

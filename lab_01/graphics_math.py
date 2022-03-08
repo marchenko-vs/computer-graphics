@@ -166,11 +166,18 @@ def get_tangent_coordinates(circle_center_1: list, radius_1: float,
         circle_center_1[0] = 0
         circle_center_1[1] = 0
 
-        a, b, c = get_tangent_coefficients(circle_center_1, circle_center_2,
-                                           radius_1, radius_2)
+        try:
+            a, b, c = get_tangent_coefficients(circle_center_1,
+                                               circle_center_2, radius_1, radius_2)
+        except TypeError:
+            return [None] 
     else:
-        a, b, c = get_tangent_coefficients(circle_center_1, circle_center_2,
+        try:
+            a, b, c = get_tangent_coefficients(circle_center_1, circle_center_2,
                                            radius_1, radius_2)
+        except TypeError:
+            return [None]    
+    
         new_x = 0
         new_y = 0
 
