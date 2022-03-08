@@ -1,15 +1,7 @@
 import math
 import numpy as np
 
-
 EPS = 1e-3
-
-
-def draw_axes(canvas_name, canvas_width: int, canvas_height: int):
-    canvas_name.create_line(canvas_width / 2, 0,
-                            canvas_width / 2, canvas_height)
-    canvas_name.create_line(0, canvas_height / 2,
-                            canvas_width, canvas_height / 2)
 
 
 def get_circle_center(coordinates: list) -> list:
@@ -94,43 +86,6 @@ def get_rectangle_area(coordinates: list) -> float:
     return rectangle_area
 
 
-def draw_circle(x: float, y: float, radius: float, canvas_name, color: str):
-    x_0 = x - radius
-    y_0 = y - radius
-    x_1 = x + radius
-    y_1 = y + radius
-
-    if radius > 225:
-        k = 225 / radius
-        x_0 *= k
-        y_0 *= k
-        x_1 *= k
-        y_1 *= k
-
-    canvas_name.create_oval(x_0 + 275, -y_0 + 225, x_1 + 275, -y_1 + 225,
-                            outline=color)
-
-
-def line_function(x: float, a: float, b: float, c: float) -> float:
-    return - (c + a * x) / b
-
-
-def draw_line(min_limit: float, max_limit: float, a: float, b: float,
-              c: float, canvas_name, color: str):
-    while min_limit < max_limit:
-        x = min_limit
-        y = line_function(x, a, b, c)
-        canvas_name.create_oval(x + 275, -y + 225, x + 275, -y + 225,
-                                outline=color)
-        min_limit += 0.01
-
-
-def draw_segment(x_0: float, y_0: float, x_1: float, y_1: float, canvas_name,
-                 color: str):
-    canvas_name.create_line(x_0 + 275, -y_0 + 225, x_1 + 275, -y_1 + 225,
-                            fill=color)
-
-
 def get_tangent_coefficients(circle_center_1: list, circle_center_2: list,
                              radius_1: float, radius_2: float) -> list:
     d_1 = radius_1
@@ -168,16 +123,17 @@ def get_tangent_coordinates(circle_center_1: list, radius_1: float,
 
         try:
             a, b, c = get_tangent_coefficients(circle_center_1,
-                                               circle_center_2, radius_1, radius_2)
+                                               circle_center_2, radius_1,
+                                               radius_2)
         except TypeError:
-            return [None] 
+            return [None]
     else:
         try:
             a, b, c = get_tangent_coefficients(circle_center_1, circle_center_2,
-                                           radius_1, radius_2)
+                                               radius_1, radius_2)
         except TypeError:
-            return [None]    
-    
+            return [None]
+
         new_x = 0
         new_y = 0
 
@@ -209,3 +165,54 @@ def get_tangent_coordinates(circle_center_1: list, radius_1: float,
     circle_center_2[1] += new_y
 
     return result
+
+
+def get_scale_coefficient(canvas_size: list, coordinates: list) -> float:
+    return (canvas_size[2] - canvas_size[0]) / (coordinates[1] - coordinates[0])
+
+
+def draw_axes(canvas_name, canvas_width: int, canvas_height: int, scale: float,
+              x_min: float, y_max: float):
+    x_0 = round(10 + (canvas_width / 2 - x_min) * scale)
+    y_0 = round(10 + (y_max - 0) * scale)
+    x_1 = round(10 + (canvas_width / 2 - x_min) * scale)
+    y_1 = round(10 + (y_max - canvas_height) * scale)
+
+    canvas_name.create_line(x_0, y_0, x_1, y_1, fill='grey')
+
+    x_0 = round(10 + (0 - x_min) * scale)
+    y_0 = round(10 + (y_max - canvas_height / 2) * scale)
+    x_1 = round(10 + (canvas_width - x_min) * scale)
+    y_1 = round(10 + (y_max - canvas_height / 2) * scale)
+
+    canvas_name.create_line(x_0, y_0, x_1, y_1, fill='grey')
+
+
+def draw_circle(x_c: float, y_c: float, radius: float, x_min: float,
+                y_max: float, canvas_name, color: str, scale: float):
+    x_n = round(10 + (x_c - x_min) * scale)
+    y_n = round(10 + (y_max - y_c) * scale)
+    radius *= scale
+
+    canvas_name.create_oval(x_n - radius, y_n + radius, x_n + radius,
+                            y_n - radius, fill=color, width=2)
+
+
+def line_function(x: float, a: float, b: float, c: float) -> float:
+    return - (c + a * x) / b
+
+
+def draw_line(min_limit: float, max_limit: float, a: float, b: float,
+              c: float, canvas_name, color: str):
+    while min_limit < max_limit:
+        x = min_limit
+        y = line_function(x, a, b, c)
+        canvas_name.create_oval(x + 275, -y + 225, x + 275, -y + 225,
+                                outline=color)
+        min_limit += 0.01
+
+
+def draw_segment(x_0: float, y_0: float, x_1: float, y_1: float, canvas_name,
+                 color: str):
+    canvas_name.create_line(x_0 + 275, -y_0 + 225, x_1 + 275, -y_1 + 225,
+                            fill=color, width=2)

@@ -1,11 +1,11 @@
 import graphics_math as gm
+import interface as inf
 import itertools as it
 import os
 import tkinter as tk
 import tkinter.messagebox as tmb
 
 from tkinter import ttk
-
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 450
@@ -16,48 +16,14 @@ CANVAS_HEIGHT = 450
 CURRENT_SET = 1
 
 
-def parse_coordinate(string: str) -> list:
-    flag = True
-
-    try:
-        result = list(map(float, string.split(', ')))
-    except ValueError:
-        flag = False
-
-    if flag:
-        return result
-
-    flag = True
-
-    try:
-        result = list(map(float, string.split('; ')))
-    except ValueError:
-        flag = False
-    
-    if flag:
-        return result
-
-    flag = True
-
-    try:
-        result = list(map(float, string.split(' ')))
-    except ValueError:
-        flag = False
-
-    if not flag:
-        return [None]
-
-    return result
-
-
-def add_coordinates():
+def add_coordinate():
     if CURRENT_SET == 1:
         tree = table_1
     else:
         tree = table_2
 
-    coordinates = parse_coordinate(add_entry.get())
-    
+    coordinates = inf.parse_coordinate(add_entry.get())
+
     if coordinates[0] is None:
         tmb.showerror(title='Ошибка!', message='Некорректный тип данных!')
         return
@@ -71,16 +37,17 @@ def add_coordinates():
 
 
 def enter_handler(event):
-    add_coordinates()
+    add_coordinate()
 
 
-def delete_coordinates():
+def delete_coordinate():
     if CURRENT_SET == 1:
         tree = table_1
     else:
         tree = table_2
 
     row_id = tree.focus()
+
     try:
         tree.delete(row_id)
     except:
@@ -113,8 +80,6 @@ def change_set():
 
 
 def solve():
-    main_canvas.delete('all')
-
     initial_set_1 = []
     for line in table_1.get_children():
         tmp = list()
@@ -133,12 +98,12 @@ def solve():
 
     if len(initial_set_1) < 3:
         tmb.showerror(title='Ошибка!', message='Введено менее трех '
-                      'координат первого множества.')
+                                               'координат первого множества.')
         return
 
     if len(initial_set_2) < 3:
         tmb.showerror(title='Ошибка!', message='Введено менее трех '
-                      'координат второго множества.')
+                                               'координат второго множества.')
         return
 
     solution_found = False
@@ -165,12 +130,12 @@ def solve():
 
             if circle_center_1[0] is None:
                 log_file.write('Окружность с координатами '
-                f'{coordinates_1} не может быть построена.\n')
-                continue 
+                               f'{coordinates_1} не может быть построена.\n')
+                continue
 
             if circle_center_2[0] is None:
                 log_file.write('Окружность с координатами '
-                f'{coordinates_1} не может быть построена.\n')
+                               f'{coordinates_1} не может быть построена.\n')
                 continue
 
             radius_1 = gm.get_circle_radius(coordinates_1)
@@ -211,14 +176,23 @@ def solve():
                      message='Решение не может быть найдено.')
         return
 
-    gm.draw_axes(main_canvas, CANVAS_WIDTH, CANVAS_HEIGHT)
+    main_canvas.delete('all')
+
+    x_min = result_circle_center_1[0] - result_radius_1
+    y_max = result_circle_center_2[1] + result_radius_2
+
+    k = gm.get_scale_coefficient([0, 0, CANVAS_WIDTH, CANVAS_HEIGHT],
+                                 [result_circle_center_1[0] - result_radius_1,
+                                  result_circle_center_2[0] + result_radius_2])
+
+    gm.draw_axes(main_canvas, CANVAS_WIDTH, CANVAS_HEIGHT, k, x_min, y_max)
 
     gm.draw_circle(result_circle_center_1[0], result_circle_center_1[1],
-                   result_radius_1,
-                   main_canvas, 'red')
+                   result_radius_1, x_min, y_max,
+                   main_canvas, 'red', k)
     gm.draw_circle(result_circle_center_2[0], result_circle_center_2[1],
-                   result_radius_2,
-                   main_canvas, 'red')
+                   result_radius_2, x_min, y_max,
+                   main_canvas, 'red', k)
 
     gm.draw_segment(result_circle_center_1[0], result_circle_center_1[1],
                     result_rectangle_coordinates[0],
@@ -289,10 +263,10 @@ add_entry = tk.Entry(font=15, width=20, justify='center', relief='sunken')
 add_entry.place(x=20, y=40)
 add_entry.bind('<Return>', enter_handler)
 
-add_button = tk.Button(text='Добавить точку', command=add_coordinates, width=23)
+add_button = tk.Button(text='Добавить точку', command=add_coordinate, width=23)
 add_button.place(x=20, y=70)
 
-delete_button = tk.Button(text='Удалить точку', command=delete_coordinates,
+delete_button = tk.Button(text='Удалить точку', command=delete_coordinate,
                           width=23)
 delete_button.place(x=20, y=100)
 
