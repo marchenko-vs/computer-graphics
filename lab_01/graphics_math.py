@@ -4,6 +4,32 @@ import numpy as np
 EPS = 1e-3
 
 
+def on_one_line(coordinates: list) -> bool:
+    result = True
+
+    if abs((coordinates[1][1] - coordinates[0][1]) *
+           (coordinates[2][0] - coordinates[0][0]) -
+           (coordinates[2][1] - coordinates[0][1]) *
+           (coordinates[1][0] - coordinates[0][0])) > EPS:
+        result = False
+
+    return result
+
+
+def circle_in_circle(center_coordinate_1: list, radius_1: float,
+                     center_coordinate_2: list, radius_2: float) -> bool:
+    result = False
+
+    if (radius_1 + math.sqrt((center_coordinate_1[0] - center_coordinate_2[0]) *
+                             (center_coordinate_1[0] - center_coordinate_2[0]) +
+                             (center_coordinate_1[1] - center_coordinate_2[1]) *
+                             (center_coordinate_1[1] -
+                              center_coordinate_2[1]))) <= radius_2:
+        result = True
+
+    return result
+
+
 def get_circle_center(coordinates: list) -> list:
     x_12 = coordinates[0][0] - coordinates[1][0]
     x_23 = coordinates[1][0] - coordinates[2][0]
@@ -13,49 +39,35 @@ def get_circle_center(coordinates: list) -> list:
     y_23 = coordinates[1][1] - coordinates[2][1]
     y_31 = coordinates[2][1] - coordinates[0][1]
 
-    z_1 = coordinates[0][0] * coordinates[0][0] + coordinates[0][1] * \
-          coordinates[0][1]
-    z_2 = coordinates[1][0] * coordinates[1][0] + coordinates[1][1] * \
-          coordinates[1][1]
-    z_3 = coordinates[2][0] * coordinates[2][0] + coordinates[2][1] * \
-          coordinates[2][1]
+    z_1 = coordinates[0][0] * coordinates[0][0] + \
+          coordinates[0][1] * coordinates[0][1]
+    z_2 = coordinates[1][0] * coordinates[1][0] + \
+          coordinates[1][1] * coordinates[1][1]
+    z_3 = coordinates[2][0] * coordinates[2][0] + \
+          coordinates[2][1] * coordinates[2][1]
 
-    try:
-        a = - ((y_12 * z_3 + y_23 * z_1 + y_31 * z_2) /
-               (2 * (x_12 * y_31 - y_12 * x_31)))
-        b = (x_12 * z_3 + x_23 * z_1 + x_31 * z_2) / \
-            (2 * (x_12 * y_31 - y_12 * x_31))
-    except ZeroDivisionError:
-        return [None, None]
+    a = - ((y_12 * z_3 + y_23 * z_1 + y_31 * z_2) /
+           (2 * (x_12 * y_31 - y_12 * x_31)))
+    b = (x_12 * z_3 + x_23 * z_1 + x_31 * z_2) / \
+        (2 * (x_12 * y_31 - y_12 * x_31))
+
+    # try:
+    #     a = - ((y_12 * z_3 + y_23 * z_1 + y_31 * z_2) /
+    #            (2 * (x_12 * y_31 - y_12 * x_31)))
+    #     b = (x_12 * z_3 + x_23 * z_1 + x_31 * z_2) / \
+    #         (2 * (x_12 * y_31 - y_12 * x_31))
+    # except ZeroDivisionError:
+    #     return [None, None]
 
     return [a, b]
 
 
-def get_triangle_area(ab: float, bc: float, ca: float) -> float:
-    half_perimeter = (ab + bc + ca) / 2
+def get_circle_radius(center_coordinate: list,
+                      circle_coordinate: list) -> float:
+    x = circle_coordinate[0] - center_coordinate[0]
+    y = circle_coordinate[1] - center_coordinate[1]
 
-    triangle_area = math.sqrt(half_perimeter * (half_perimeter - ab) *
-                              (half_perimeter - bc) * (half_perimeter - ca))
-
-    return triangle_area
-
-
-def get_circle_radius(coordinates: list) -> float:
-    ab = math.sqrt((coordinates[1][0] - coordinates[0][0]) *
-                   (coordinates[1][0] - coordinates[0][0]) +
-                   (coordinates[1][1] - coordinates[0][1]) *
-                   (coordinates[1][1] - coordinates[0][1]))
-    bc = math.sqrt((coordinates[2][0] - coordinates[1][0]) *
-                   (coordinates[2][0] - coordinates[1][0]) +
-                   (coordinates[2][1] - coordinates[1][1]) *
-                   (coordinates[2][1] - coordinates[1][1]))
-    ca = math.sqrt((coordinates[0][0] - coordinates[2][0]) *
-                   (coordinates[0][0] - coordinates[2][0]) +
-                   (coordinates[0][1] - coordinates[2][1]) *
-                   (coordinates[0][1] - coordinates[2][1]))
-
-    triangle_area = get_triangle_area(ab, bc, ca)
-    circle_radius = ab * bc * ca / (4 * triangle_area)
+    circle_radius = math.sqrt(x * x + y * y)
 
     return circle_radius
 
@@ -98,33 +110,35 @@ def get_tangent_coefficients(circle_center_1: list, circle_center_2: list,
         return None
 
     a = ((d_2 - d_1) * v_x + v_y *
-         math.sqrt(v_x * v_x + v_y * v_y +
+         math.sqrt(v_x * v_x + v_y * v_y -
                    ((d_2 - d_1) * (d_2 - d_1)))) / (v_x * v_x + v_y * v_y)
     b = ((d_2 - d_1) * v_y - v_x *
          math.sqrt(v_x * v_x + v_y * v_y -
                    ((d_2 - d_1) * (d_2 - d_1)))) / (v_x * v_x + v_y * v_y)
     c = d_1
-    c -= a * circle_center_1[0] + b * circle_center_1[1]
 
     return [a, b, c]
 
 
 def get_tangent_coordinates(circle_center_1: list, radius_1: float,
                             circle_center_2: list, radius_2: float) -> list:
+    current_circle_center_1 = circle_center_1.copy()
+    current_circle_center_2 = circle_center_2.copy()
+
     if abs(circle_center_1[0]) > EPS or abs(circle_center_1[1]) > EPS:
         new_x = circle_center_1[0]
         new_y = circle_center_1[1]
 
-        circle_center_2[0] -= circle_center_1[0]
-        circle_center_2[1] -= circle_center_1[1]
+        current_circle_center_2[0] -= new_x
+        current_circle_center_2[1] -= new_y
 
-        circle_center_1[0] = 0
-        circle_center_1[1] = 0
+        current_circle_center_1[0] = 0
+        current_circle_center_1[1] = 0
 
         try:
-            a, b, c = get_tangent_coefficients(circle_center_1,
-                                               circle_center_2, radius_1,
-                                               radius_2)
+            a, b, c = get_tangent_coefficients(current_circle_center_1,
+                                               current_circle_center_2,
+                                               radius_1, radius_2)
         except TypeError:
             return [None]
     else:
@@ -138,13 +152,15 @@ def get_tangent_coordinates(circle_center_1: list, radius_1: float,
         new_y = 0
 
     matrix_1 = np.array([[b, -a], [a, b]])
-    vector_1 = np.array([-a * circle_center_1[1] + b * circle_center_1[0],
-                         -c])
+    vector_1 = np.array(
+        [-a * current_circle_center_1[1] + b * current_circle_center_1[0],
+         -c])
     coordinates_1 = np.linalg.solve(matrix_1, vector_1)
 
     matrix_2 = np.array([[b, -a], [a, b]])
-    vector_2 = np.array([-a * circle_center_2[1] + b * circle_center_2[0],
-                         -c])
+    vector_2 = np.array(
+        [-a * current_circle_center_2[1] + b * current_circle_center_2[0],
+         -c])
     coordinates_2 = np.linalg.solve(matrix_2, vector_2)
 
     coordinates_1 = coordinates_1.tolist()
@@ -152,71 +168,143 @@ def get_tangent_coordinates(circle_center_1: list, radius_1: float,
 
     result = list()
 
-    result.append(int(coordinates_1[0]) + new_x)
-    result.append(int(coordinates_1[1]) + new_y)
+    result.append(coordinates_1[0] + new_x)
+    result.append(coordinates_1[1] + new_y)
 
-    result.append(int(coordinates_2[0]) + new_x)
-    result.append(int(coordinates_2[1]) + new_y)
-
-    circle_center_1[0] += new_x
-    circle_center_1[1] += new_y
-
-    circle_center_2[0] += new_x
-    circle_center_2[1] += new_y
+    result.append(coordinates_2[0] + new_x)
+    result.append(coordinates_2[1] + new_y)
 
     return result
 
 
-def get_scale_coefficient(canvas_size: list, coordinates: list) -> float:
-    k_x = (canvas_size[2] - canvas_size[0]) / (coordinates[2] - coordinates[0])
-    k_y = (canvas_size[3] - canvas_size[1]) / (coordinates[3] - coordinates[1])
+def get_min_x(coordinates: list) -> float:
+    result = coordinates[0][0]
 
-    return k_x, k_y
+    for number in coordinates:
+        if number[0] < result:
+            result = number[0]
+
+    return result
+
+
+def get_max_x(coordinates: list) -> float:
+    result = coordinates[0][0]
+
+    for number in coordinates:
+        if number[0] > result:
+            result = number[0]
+
+    return result
+
+
+def get_min_y(coordinates: list) -> float:
+    result = coordinates[0][1]
+
+    for number in coordinates:
+        if number[1] < result:
+            result = number[1]
+
+    return result
+
+
+def get_max_y(coordinates: list) -> float:
+    result = coordinates[0][1]
+
+    for number in coordinates:
+        if number[1] > result:
+            result = number[1]
+
+    return result
+
+
+def get_critical_points(circle_center_1: list, radius_1: float,
+                        circle_center_2: list, radius_2: float) -> list:
+    coordinates = [[0, 0], [circle_center_1[0] - radius_1,
+                            circle_center_1[1]],
+                   [circle_center_1[0] + radius_1,
+                    circle_center_1[1]],
+                   [circle_center_1[0],
+                    circle_center_1[1] - radius_1],
+                   [circle_center_1[0],
+                    circle_center_1[1] + radius_1],
+                   [circle_center_2[0] - radius_2,
+                    circle_center_2[1]],
+                   [circle_center_2[0] + radius_2,
+                    circle_center_2[1]],
+                   [circle_center_2[0],
+                    circle_center_2[1] - radius_2],
+                   [circle_center_2[0],
+                    circle_center_2[1] + radius_2]]
+
+    x_min = get_min_x(coordinates)
+    x_max = get_max_x(coordinates)
+
+    y_min = get_min_y(coordinates)
+    y_max = get_max_y(coordinates)
+
+    return [x_min, x_max, y_min, y_max]
+
+
+def get_scale_coefficient(canvas_size: list, critical_points: list) -> float:
+    k_x = (canvas_size[2] - canvas_size[0]) / \
+          (critical_points[1] - critical_points[0])
+    k_y = (canvas_size[3] - canvas_size[1]) / \
+          (critical_points[3] - critical_points[2])
+
+    return min(k_x, k_y)
 
 
 def draw_circle(x_c: float, y_c: float, radius: float, x_min: float,
-                y_max: float, k_x: float, k_y: float, canvas_name, color: str):
+                y_max: float, k: float, canvas_name, outline: str, width: int):
     x_0 = x_c - radius
-    y_0 = y_c + radius
+    y_0 = y_c - radius
 
     x_1 = x_c + radius
-    y_1 = y_c - radius
+    y_1 = y_c + radius
 
-    k = min(k_x, k_y)
+    x_0 = round(15 + (x_0 - x_min) * k)
+    y_0 = round(15 + (y_max - y_0) * k)
 
-    x_0 = round(10 + (x_0 - x_min) * k)
-    y_0 = round(10 + (y_max - y_0) * k)
-    
-    x_1 = round(10 + (x_1 - x_min) * k)
-    y_1 = round(10 + (y_max - y_1) * k)
+    x_1 = round(15 + (x_1 - x_min) * k)
+    y_1 = round(15 + (y_max - y_1) * k)
 
-    canvas_name.create_oval(x_0, y_0, x_1, y_1, outline=color, width=2)
-
-
-def line_function(x: float, a: float, b: float, c: float) -> float:
-    return - (c + a * x) / b
-
-
-def draw_line(min_limit: float, max_limit: float, a: float, b: float,
-              c: float, canvas_name, color: str):
-    while min_limit < max_limit:
-        x = min_limit
-        y = line_function(x, a, b, c)
-        canvas_name.create_oval(x + 275, -y + 225, x + 275, -y + 225,
-                                outline=color)
-        min_limit += 0.01
+    canvas_name.create_oval(x_0, y_0, x_1, y_1, outline=outline, width=width)
 
 
 def draw_segment(x_0: float, y_0: float, x_1: float, y_1: float, x_min: float,
-                 y_max: float, k_x: float, k_y: float, canvas_name, color: str):
-    k = min(k_x, k_y)
-    
-    x_0 = round(10 + (x_0 - x_min) * k)
-    y_0 = round(10 + (y_max - y_0) * k)
+                 y_max: float, k: float, canvas_name, fill: str, width: int):
+    x_0 = round(15 + (x_0 - x_min) * k)
+    y_0 = round(15 + (y_max - y_0) * k)
 
-    x_1 = round(10 + (x_1 - x_min) * k)
-    y_1 = round(10 + (y_max - y_1) * k)
-
+    x_1 = round(15 + (x_1 - x_min) * k)
+    y_1 = round(15 + (y_max - y_1) * k)
 
     canvas_name.create_line(x_0, y_0, x_1, y_1,
-                            fill=color, width=2)
+                            fill=fill, width=width)
+
+
+def draw_axes(canvas_size: list, x_min: float, y_max: float, k: float,
+              canvas_name, fill: str, width: int):
+    x_0 = 0
+    x_1 = canvas_size[2]
+
+    y_0 = 0
+    y_1 = 0
+
+    y_0 = round(15 + (y_max - y_0) * k)
+    y_1 = round(15 + (y_max - y_1) * k)
+
+    canvas_name.create_line(x_0, y_0, x_1, y_1,
+                            fill=fill, width=width)
+
+    x_0 = 0
+    x_1 = 0
+
+    y_0 = 0
+    y_1 = canvas_size[3]
+
+    x_0 = round(15 + (x_0 - x_min) * k)
+    x_1 = round(15 + (x_1 - x_min) * k)
+
+    canvas_name.create_line(x_0, y_0, x_1, y_1,
+                            fill=fill, width=width)

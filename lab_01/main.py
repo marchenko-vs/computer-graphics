@@ -14,9 +14,24 @@ WINDOW_HEIGHT = 720
 CANVAS_WIDTH = 1000
 CANVAS_HEIGHT = 700
 
+PADDING = 15
+
 CURRENT_SET = 1
 
 TO_CHANGE = False
+
+
+def error_handler(number: int):
+    match number:
+        case 1:
+            tmb.showinfo(title='Результат.',
+                         message='Решение не может быть найдено, так как...')
+        case 2:
+            tmb.showinfo(title='Результат.',
+                         message='Решение не может быть найдено, так как...')
+        case 3:
+            tmb.showinfo(title='Результат.',
+                         message='Решение не может быть найдено, так как...')
 
 
 def add_coordinate():
@@ -61,7 +76,7 @@ def change_coordinate():
         return
 
     row_id = tree.focus()
-    
+
     tree.delete(row_id)
     tree.insert('', tk.END, values=coordinate)
 
@@ -136,16 +151,20 @@ def solve():
     initial_set_1 = []
     for line in table_1.get_children():
         tmp = list()
+
         for value in table_1.item(line)['values']:
             tmp.append(float(value))
+
         initial_set_1.append(tmp)
         tmp = []
 
     initial_set_2 = []
     for line in table_2.get_children():
         tmp = list()
+
         for value in table_2.item(line)['values']:
             tmp.append(float(value))
+
         initial_set_2.append(tmp)
         tmp = []
 
@@ -161,6 +180,10 @@ def solve():
 
     solution_found = False
 
+    cases_counted = 0
+
+    error_code = 0
+
     result_area = 0
 
     result_coordinates_1 = list()
@@ -175,31 +198,58 @@ def solve():
 
     for coordinates_1 in it.combinations(initial_set_1, 3):
         for coordinates_2 in it.combinations(initial_set_2, 3):
+            cases_counted += 1
+
             coordinates_1 = list(coordinates_1)
             coordinates_2 = list(coordinates_2)
+
+            # Проверка на то, что точки лежат на одной прямой
+
+            if gm.on_one_line(coordinates_1):
+                log_file.write(f'Точки с координатами {coordinates_1} '
+                               'расположены на одной прямой.\n')
+                error_code = 1
+                continue
+
+            if gm.on_one_line(coordinates_2):
+                log_file.write(f'Точки с координатами {coordinates_2} '
+                               'расположены на одной прямой.\n')
+                error_code = 1
+                continue
+
+            # Вычисление координат центров окружностей
 
             circle_center_1 = gm.get_circle_center(coordinates_1)
             circle_center_2 = gm.get_circle_center(coordinates_2)
 
-            if circle_center_1[0] is None:
-                log_file.write('Окружность с координатами '
-                               f'{coordinates_1} не может быть построена.\n')
+            # Вычисление значений радиусов окружностей
+
+            radius_1 = gm.get_circle_radius(circle_center_1, coordinates_1[0])
+            radius_2 = gm.get_circle_radius(circle_center_2, coordinates_2[0])
+
+            if gm.circle_in_circle(circle_center_1, radius_1,
+                                   circle_center_2, radius_2):
+                log_file.write(f'Окружность с координатами {coordinates_1} '
+                               'расположена внутри окружности с координатами '
+                               f'{coordinates_2}.\n')
+                error_code = 2
                 continue
 
-            if circle_center_2[0] is None:
-                log_file.write('Окружность с координатами '
-                               f'{coordinates_1} не может быть построена.\n')
+            if gm.circle_in_circle(circle_center_2, radius_2,
+                                   circle_center_1, radius_1):
+                log_file.write(f'Окружность с координатами {coordinates_2} '
+                               'расположена внутри окружности с координатами '
+                               f'{coordinates_1}.\n')
+                error_code = 3
                 continue
 
-            radius_1 = gm.get_circle_radius(coordinates_1)
-            radius_2 = gm.get_circle_radius(coordinates_2)
+            # Вычисление координат двух точек касательных
 
             rectangle_coordinates = \
                 gm.get_tangent_coordinates(circle_center_1, radius_1,
                                            circle_center_2, radius_2)
 
-            if rectangle_coordinates[0] is None:
-                continue
+            # Вычисление площади четырехугольника
 
             current_area = gm.get_rectangle_area(
                 [circle_center_1, circle_center_2,
@@ -207,8 +257,8 @@ def solve():
 
             solution_found = True
 
-            log_file.write(f'Area is {current_area} for circles '
-                           f'{coordinates_1} and {coordinates_2}.\n')
+            log_file.write(f'Площадь равна {current_area} для окружностей с '
+                           f' точками {coordinates_1} и {coordinates_2}.\n')
 
             if current_area > result_area:
                 result_area = current_area
@@ -223,66 +273,61 @@ def solve():
 
                 result_rectangle_coordinates = rectangle_coordinates
 
+    log_file.write(f'Было рассмотрено {cases_counted} случаев.\n')
+
     if not solution_found:
-        tmb.showinfo(title='Результат.',
-                     message='Решение не может быть найдено.')
+        error_handler(error_code)
         return
-
-    '''result_circle_center_1 = [-50, -50]
-    result_circle_center_2 = [40, 60]
-
-    result_radius_1 = 30
-    result_radius_2 = 20'''
 
     main_canvas.delete('all')
 
-    x_min = result_circle_center_1[0] - result_radius_1
-    y_max = result_circle_center_2[1] + result_radius_2
+    critical_points = gm.get_critical_points(result_circle_center_1,
+                                             result_radius_1,
+                                             result_circle_center_2,
+                                             result_radius_2)
 
-    k_x, k_y = gm.get_scale_coefficient([10, 10, CANVAS_WIDTH - 10, CANVAS_HEIGHT - 10],
-                                 [result_circle_center_1[0] - result_radius_1,
-                                  result_circle_center_1[1] - result_radius_1,
-                                  result_circle_center_2[0] + result_radius_2,
-                                  result_circle_center_2[1] + result_radius_2])
+    k = gm.get_scale_coefficient(
+        [PADDING, PADDING, CANVAS_WIDTH - PADDING, CANVAS_HEIGHT - PADDING],
+        critical_points)
 
     gm.draw_circle(result_circle_center_1[0], result_circle_center_1[1],
-                   result_radius_1, x_min, y_max, k_x, k_y,
-                   main_canvas, 'red')
+                   result_radius_1, critical_points[0], critical_points[3], k,
+                   main_canvas, 'red', 2)
     gm.draw_circle(result_circle_center_2[0], result_circle_center_2[1],
-                   result_radius_2, x_min, y_max, k_x, k_y,
-                   main_canvas, 'red')
+                   result_radius_2, critical_points[0], critical_points[3], k,
+                   main_canvas, 'red', 2)
 
-    gm.draw_segment(-275, 0, 275, 0,
-                    x_min, y_max, k_x, k_y, main_canvas, 'grey')
-    gm.draw_segment(0, -275, 0, 275,
-                    x_min, y_max, k_x, k_y, main_canvas, 'grey')
+    gm.draw_axes([0, 0, CANVAS_WIDTH, CANVAS_HEIGHT], critical_points[0],
+                 critical_points[3], k, main_canvas, 'black', 1)
 
     gm.draw_segment(result_circle_center_1[0], result_circle_center_1[1],
                     result_rectangle_coordinates[0],
-                    result_rectangle_coordinates[1], x_min, y_max, k_x, k_y,
-                    main_canvas, 'green')
+                    result_rectangle_coordinates[1], critical_points[0], critical_points[3], k,
+                    main_canvas, 'green', 2)
     gm.draw_segment(result_rectangle_coordinates[0],
                     result_rectangle_coordinates[1],
                     result_rectangle_coordinates[2],
-                    result_rectangle_coordinates[3], x_min, y_max, k_x, k_y,
-                    main_canvas, 'green')
+                    result_rectangle_coordinates[3], critical_points[0], critical_points[3], k,
+                    main_canvas, 'green', 2)
     gm.draw_segment(result_circle_center_2[0], result_circle_center_2[1],
                     result_rectangle_coordinates[2],
-                    result_rectangle_coordinates[3], x_min, y_max, k_x, k_y,
-                    main_canvas, 'green')
+                    result_rectangle_coordinates[3], critical_points[0], critical_points[3], k,
+                    main_canvas, 'green', 2)
     gm.draw_segment(result_circle_center_1[0], result_circle_center_1[1],
                     result_circle_center_2[0], result_circle_center_2[1],
-                    x_min, y_max, k_x, k_y, main_canvas, 'green')
+                    critical_points[0], critical_points[3], k, main_canvas, 'green', 2)
 
     log_file.write(f'The largest area is {result_area} for circles '
                    f'{result_coordinates_1} and {result_coordinates_2}.\n')
 
     tk.messagebox.showinfo(title='Результат.',
-                           message=f'Самая большая площадь четырехугольника - {result_area} '
-                                   f'для окружностей {result_coordinates_1} и f{result_coordinates_2}.')
+                           message=f'Самая большая площадь четырехугольника равна {result_area} '
+                                   f'для окружностей {result_coordinates_1} и '
+                                   f'{result_coordinates_2}.')
+
 
 try:
-    log_file = open('logs/log.txt', 'w')
+    log_file = open('logs/log.txt', 'w', encoding='utf-8')
 except FileNotFoundError:
     os.system('mkdir logs')
     log_file = open('logs/log.txt', 'w')
