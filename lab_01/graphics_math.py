@@ -72,7 +72,7 @@ def get_circle_radius(center_coordinate: list,
     return circle_radius
 
 
-def get_rectangle_area(coordinates: list) -> float:
+def get_triangle_area(coordinates: list) -> float:
     ab = math.sqrt((coordinates[1][0] - coordinates[0][0]) *
                    (coordinates[1][0] - coordinates[0][0]) +
                    (coordinates[1][1] - coordinates[0][1]) *
@@ -81,19 +81,25 @@ def get_rectangle_area(coordinates: list) -> float:
                    (coordinates[2][0] - coordinates[1][0]) +
                    (coordinates[2][1] - coordinates[1][1]) *
                    (coordinates[2][1] - coordinates[1][1]))
-    cd = math.sqrt((coordinates[3][0] - coordinates[2][0]) *
-                   (coordinates[3][0] - coordinates[2][0]) +
-                   (coordinates[3][1] - coordinates[2][1]) *
-                   (coordinates[3][1] - coordinates[2][1]))
-    da = math.sqrt((coordinates[0][0] - coordinates[3][0]) *
-                   (coordinates[0][0] - coordinates[3][0]) +
-                   (coordinates[0][1] - coordinates[3][1]) *
-                   (coordinates[0][1] - coordinates[3][1]))
+    ca = math.sqrt((coordinates[0][0] - coordinates[2][0]) *
+                   (coordinates[0][0] - coordinates[2][0]) +
+                   (coordinates[0][1] - coordinates[2][1]) *
+                   (coordinates[0][1] - coordinates[2][1]))
 
-    half_perimeter = (ab + bc + cd + da) / 2
+    half_perimeter = (ab + bc + ca) / 2
 
-    rectangle_area = math.sqrt((half_perimeter - ab) * (half_perimeter - bc) *
-                               (half_perimeter - cd) * (half_perimeter - da))
+    triangle_area = math.sqrt(half_perimeter * (half_perimeter - ab) *
+                               (half_perimeter - bc) * (half_perimeter - ca))
+
+    return triangle_area
+
+
+def get_rectangle_area(coordinates: list) -> float:
+    triangle_area_1 = get_triangle_area(coordinates[:3])
+    triangle_area_2 = get_triangle_area([coordinates[0],
+                                         coordinates[2], coordinates[3]])
+
+    rectangle_area = triangle_area_1 + triangle_area_2
 
     return rectangle_area
 
@@ -273,6 +279,12 @@ def draw_circle(x_c: float, y_c: float, radius: float, x_min: float,
 
 def draw_segment(x_0: float, y_0: float, x_1: float, y_1: float, x_min: float,
                  y_max: float, k: float, canvas_name, fill: str, width: int):
+    x_t_1 = x_0
+    y_t_1 = y_0
+
+    x_t_2 = x_1
+    y_t_2 = y_1
+
     x_0 = round(15 + (x_0 - x_min) * k)
     y_0 = round(15 + (y_max - y_0) * k)
 
@@ -281,6 +293,11 @@ def draw_segment(x_0: float, y_0: float, x_1: float, y_1: float, x_min: float,
 
     canvas_name.create_line(x_0, y_0, x_1, y_1,
                             fill=fill, width=width)
+
+    canvas_name.create_text(x_0, y_0 + 20,
+                            text='({:.2f}; {:.2f})'.format(x_t_1, y_t_1), font=8)
+    canvas_name.create_text(x_1, y_1 + 20,
+                            text='({:.2f}; {:.2f})'.format(x_t_2, y_t_2), font=8)
 
 
 def draw_axes(canvas_size: list, x_min: float, y_max: float, k: float,
