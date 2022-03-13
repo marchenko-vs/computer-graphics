@@ -7,13 +7,16 @@ import tkinter.messagebox as tmb
 
 from tkinter import ttk
 
-WINDOW_WIDTH = 800
-WINDOW_HEIGHT = 450
 
-CANVAS_WIDTH = 550
-CANVAS_HEIGHT = 450
+WINDOW_WIDTH = 1280
+WINDOW_HEIGHT = 720
+
+CANVAS_WIDTH = 1000
+CANVAS_HEIGHT = 700
 
 CURRENT_SET = 1
+
+TO_CHANGE = False
 
 
 def add_coordinate():
@@ -36,8 +39,58 @@ def add_coordinate():
         tree.insert('', tk.END, values=coordinates)
 
 
+def change_coordinate():
+    global TO_CHANGE
+
+    if not TO_CHANGE:
+        return
+
+    if CURRENT_SET == 1:
+        tree = table_1
+    else:
+        tree = table_2
+
+    coordinate = inf.parse_coordinate(add_entry.get())
+
+    if coordinate[0] is None:
+        tmb.showerror(title='Ошибка!', message='Некорректный тип данных!')
+        return
+
+    if len(coordinate) != 2:
+        tmb.showerror(title='Ошибка!', message='Некорректный формат данных!')
+        return
+
+    row_id = tree.focus()
+    
+    tree.delete(row_id)
+    tree.insert('', tk.END, values=coordinate)
+
+    TO_CHANGE = False
+
+
+def change_row():
+    global TO_CHANGE
+
+    if CURRENT_SET == 1:
+        tree = table_1
+    else:
+        tree = table_2
+
+    TO_CHANGE = True
+
+    row_id = tree.focus()
+    coordinate = tree.item(row_id)['values']
+    input_str = ', '.join(coordinate)
+    add_entry.delete(0, 'end')
+    add_entry.insert(0, input_str)
+
+
 def enter_handler(event):
     add_coordinate()
+
+
+def d_click_handler(event):
+    change_row()
 
 
 def delete_coordinate():
@@ -146,7 +199,6 @@ def solve():
                                            circle_center_2, radius_2)
 
             if rectangle_coordinates[0] is None:
-                print('DBG')
                 continue
 
             current_area = gm.get_rectangle_area(
@@ -176,40 +228,51 @@ def solve():
                      message='Решение не может быть найдено.')
         return
 
+    '''result_circle_center_1 = [-50, -50]
+    result_circle_center_2 = [40, 60]
+
+    result_radius_1 = 30
+    result_radius_2 = 20'''
+
     main_canvas.delete('all')
 
     x_min = result_circle_center_1[0] - result_radius_1
     y_max = result_circle_center_2[1] + result_radius_2
 
-    k = gm.get_scale_coefficient([0, 0, CANVAS_WIDTH, CANVAS_HEIGHT],
+    k_x, k_y = gm.get_scale_coefficient([10, 10, CANVAS_WIDTH - 10, CANVAS_HEIGHT - 10],
                                  [result_circle_center_1[0] - result_radius_1,
-                                  result_circle_center_2[0] + result_radius_2])
-
-    gm.draw_axes(main_canvas, CANVAS_WIDTH, CANVAS_HEIGHT, k, x_min, y_max)
+                                  result_circle_center_1[1] - result_radius_1,
+                                  result_circle_center_2[0] + result_radius_2,
+                                  result_circle_center_2[1] + result_radius_2])
 
     gm.draw_circle(result_circle_center_1[0], result_circle_center_1[1],
-                   result_radius_1, x_min, y_max,
-                   main_canvas, 'red', k)
+                   result_radius_1, x_min, y_max, k_x, k_y,
+                   main_canvas, 'red')
     gm.draw_circle(result_circle_center_2[0], result_circle_center_2[1],
-                   result_radius_2, x_min, y_max,
-                   main_canvas, 'red', k)
+                   result_radius_2, x_min, y_max, k_x, k_y,
+                   main_canvas, 'red')
+
+    gm.draw_segment(-275, 0, 275, 0,
+                    x_min, y_max, k_x, k_y, main_canvas, 'grey')
+    gm.draw_segment(0, -275, 0, 275,
+                    x_min, y_max, k_x, k_y, main_canvas, 'grey')
 
     gm.draw_segment(result_circle_center_1[0], result_circle_center_1[1],
                     result_rectangle_coordinates[0],
-                    result_rectangle_coordinates[1],
+                    result_rectangle_coordinates[1], x_min, y_max, k_x, k_y,
                     main_canvas, 'green')
     gm.draw_segment(result_rectangle_coordinates[0],
                     result_rectangle_coordinates[1],
                     result_rectangle_coordinates[2],
-                    result_rectangle_coordinates[3],
+                    result_rectangle_coordinates[3], x_min, y_max, k_x, k_y,
                     main_canvas, 'green')
     gm.draw_segment(result_circle_center_2[0], result_circle_center_2[1],
                     result_rectangle_coordinates[2],
-                    result_rectangle_coordinates[3],
+                    result_rectangle_coordinates[3], x_min, y_max, k_x, k_y,
                     main_canvas, 'green')
     gm.draw_segment(result_circle_center_1[0], result_circle_center_1[1],
                     result_circle_center_2[0], result_circle_center_2[1],
-                    main_canvas, 'green')
+                    x_min, y_max, k_x, k_y, main_canvas, 'green')
 
     log_file.write(f'The largest area is {result_area} for circles '
                    f'{result_coordinates_1} and {result_coordinates_2}.\n')
@@ -217,7 +280,6 @@ def solve():
     tk.messagebox.showinfo(title='Результат.',
                            message=f'Самая большая площадь четырехугольника - {result_area} '
                                    f'для окружностей {result_coordinates_1} и f{result_coordinates_2}.')
-
 
 try:
     log_file = open('logs/log.txt', 'w')
@@ -227,7 +289,7 @@ except FileNotFoundError:
 
 main_form = tk.Tk()
 main_form.title('Лабораторная работа #1')
-main_form.geometry(f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}+400+300')
+main_form.geometry(f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}+100+100')
 main_form.resizable(width=False, height=False)
 
 style = ttk.Style()
@@ -244,6 +306,7 @@ table_1.heading('x', text='X')
 table_1.column("#2", anchor='center', stretch=False, width=100)
 table_1.heading('y', text='Y')
 table_1.place(x=20, y=200)
+table_1.bind('<Double-Button-1>', d_click_handler)
 
 vsb_1 = ttk.Scrollbar(main_form, orient="vertical", command=table_1.yview)
 vsb_1.place(x=230, y=200, height=230)
@@ -276,6 +339,9 @@ read_button.place(x=20, y=130)
 change_set_button = tk.Button(text='Редактировать 2-е множество',
                               command=change_set, width=23)
 change_set_button.place(x=20, y=160)
+
+change_button = tk.Button(text='Изменить', command=change_coordinate, width=23)
+change_button.place(x=10, y=350)
 
 main_form.mainloop()
 

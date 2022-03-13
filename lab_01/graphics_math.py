@@ -168,34 +168,29 @@ def get_tangent_coordinates(circle_center_1: list, radius_1: float,
 
 
 def get_scale_coefficient(canvas_size: list, coordinates: list) -> float:
-    return (canvas_size[2] - canvas_size[0]) / (coordinates[1] - coordinates[0])
+    k_x = (canvas_size[2] - canvas_size[0]) / (coordinates[2] - coordinates[0])
+    k_y = (canvas_size[3] - canvas_size[1]) / (coordinates[3] - coordinates[1])
 
-
-def draw_axes(canvas_name, canvas_width: int, canvas_height: int, scale: float,
-              x_min: float, y_max: float):
-    x_0 = round(10 + (canvas_width / 2 - x_min) * scale)
-    y_0 = round(10 + (y_max - 0) * scale)
-    x_1 = round(10 + (canvas_width / 2 - x_min) * scale)
-    y_1 = round(10 + (y_max - canvas_height) * scale)
-
-    canvas_name.create_line(x_0, y_0, x_1, y_1, fill='grey')
-
-    x_0 = round(10 + (0 - x_min) * scale)
-    y_0 = round(10 + (y_max - canvas_height / 2) * scale)
-    x_1 = round(10 + (canvas_width - x_min) * scale)
-    y_1 = round(10 + (y_max - canvas_height / 2) * scale)
-
-    canvas_name.create_line(x_0, y_0, x_1, y_1, fill='grey')
+    return k_x, k_y
 
 
 def draw_circle(x_c: float, y_c: float, radius: float, x_min: float,
-                y_max: float, canvas_name, color: str, scale: float):
-    x_n = round(10 + (x_c - x_min) * scale)
-    y_n = round(10 + (y_max - y_c) * scale)
-    radius *= scale
+                y_max: float, k_x: float, k_y: float, canvas_name, color: str):
+    x_0 = x_c - radius
+    y_0 = y_c + radius
 
-    canvas_name.create_oval(x_n - radius, y_n + radius, x_n + radius,
-                            y_n - radius, fill=color, width=2)
+    x_1 = x_c + radius
+    y_1 = y_c - radius
+
+    k = min(k_x, k_y)
+
+    x_0 = round(10 + (x_0 - x_min) * k)
+    y_0 = round(10 + (y_max - y_0) * k)
+    
+    x_1 = round(10 + (x_1 - x_min) * k)
+    y_1 = round(10 + (y_max - y_1) * k)
+
+    canvas_name.create_oval(x_0, y_0, x_1, y_1, outline=color, width=2)
 
 
 def line_function(x: float, a: float, b: float, c: float) -> float:
@@ -212,7 +207,16 @@ def draw_line(min_limit: float, max_limit: float, a: float, b: float,
         min_limit += 0.01
 
 
-def draw_segment(x_0: float, y_0: float, x_1: float, y_1: float, canvas_name,
-                 color: str):
-    canvas_name.create_line(x_0 + 275, -y_0 + 225, x_1 + 275, -y_1 + 225,
+def draw_segment(x_0: float, y_0: float, x_1: float, y_1: float, x_min: float,
+                 y_max: float, k_x: float, k_y: float, canvas_name, color: str):
+    k = min(k_x, k_y)
+    
+    x_0 = round(10 + (x_0 - x_min) * k)
+    y_0 = round(10 + (y_max - y_0) * k)
+
+    x_1 = round(10 + (x_1 - x_min) * k)
+    y_1 = round(10 + (y_max - y_1) * k)
+
+
+    canvas_name.create_line(x_0, y_0, x_1, y_1,
                             fill=color, width=2)

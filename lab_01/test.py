@@ -15,12 +15,12 @@ x_a = 0
 y_a = 0
 
 x_c_1 = -50
-y_c_1 = -50
-radius_1 = 30
+y_c_1 = 0
+radius_1 = 10
 
 x_c_2 = 50
-y_c_2 = 50
-radius_2 = 10
+y_c_2 = 0
+radius_2 = 30
 
 k_x_max = CANVAS_WIDTH - 50
 k_y_max = CANVAS_HEIGHT - 50
