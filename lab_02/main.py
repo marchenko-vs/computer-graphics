@@ -5,8 +5,8 @@ import graphics_math as gm
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
-CANVAS_WIDTH = 1000
-CANVAS_HEIGHT = 700
+CANVAS_WIDTH = 1280
+CANVAS_HEIGHT = 550
 
 CURRENT_X_C = 0
 CURRENT_Y_C = 0
@@ -104,30 +104,67 @@ main_window.resizable(width=False, height=False)
 
 main_canvas = tk.Canvas(width=CANVAS_WIDTH, height=CANVAS_HEIGHT,
                         background='white')
-main_canvas.pack(side='right')
+main_canvas.pack(side='top')
 
-center_entry_x = tk.Entry()
-center_entry_x.place(x=20, y=20)
+center_label = tk.Label(text='Центр масштабирования/поворота', font=15)
+center_label.place(x=80, y=580)
 
-center_entry_y = tk.Entry()
-center_entry_y.place(x=20, y=50)
+center_label_x = tk.Label(text='Xc', font=15)
+center_label_x.place(x=110, y=625)
 
-scale_entry_x = tk.Entry()
-scale_entry_x.place(x=20, y=100)
+center_label_y = tk.Label(text='Yc', font=15)
+center_label_y.place(x=110, y=665)
 
-scale_entry_y = tk.Entry()
-scale_entry_y.place(x=20, y=130)
+center_entry_x = tk.Entry(font='Calibri 15', width=10, justify='center')
+center_entry_x.place(x=150, y=620)
 
-scale_button = tk.Button(text='Масштабировать', command=scale_object)
-scale_button.place(x=20, y=160)
+center_entry_y = tk.Entry(font='Calibri 15', width=10, justify='center')
+center_entry_y.place(x=150, y=660)
 
-transfer_entry_x = tk.Entry()
-transfer_entry_x.place(x=20, y=190)
+transfer_label = tk.Label(text='Перенос', font=15)
+transfer_label.place(x=480, y=580)
 
-transfer_entry_y = tk.Entry()
-transfer_entry_y.place(x=20, y=220)
+transfer_label_x = tk.Label(text='dX', font=15)
+transfer_label_x.place(x=410, y=625)
 
-transfer_button = tk.Button(text='Перенести', command=transfer_object)
-transfer_button.place(x=20, y=250)
+transfer_label_y = tk.Label(text='dY', font=15)
+transfer_label_y.place(x=410, y=665)
+
+transfer_entry_x = tk.Entry(font='Calibri 15', width=10, justify='center')
+transfer_entry_x.place(x=450, y=620)
+
+transfer_entry_y = tk.Entry(font='Calibri 15', width=10, justify='center')
+transfer_entry_y.place(x=450, y=660)
+
+scale_label = tk.Label(text='Масштабирование', font=15)
+scale_label.place(x=740, y=580)
+
+scale_label_x = tk.Label(text='Kx', font=15)
+scale_label_x.place(x=710, y=625)
+
+scale_label_y = tk.Label(text='Ky', font=15)
+scale_label_y.place(x=710, y=665)
+
+scale_entry_x = tk.Entry(font='Calibri 15', width=10, justify='center')
+scale_entry_x.place(x=750, y=620)
+
+scale_entry_y = tk.Entry(font='Calibri 15', width=10, justify='center')
+scale_entry_y.place(x=750, y=660)
+
+rotate_label = tk.Label(text='Поворот', font=15)
+rotate_label.place(x=1080, y=580)
+
+rotate_entry_x = tk.Entry(font='Calibri 15', width=10, justify='center')
+rotate_entry_x.place(x=1050, y=620)
+
+rotate_label_phi = tk.Label(text='α', font=20)
+rotate_label_phi.place(x=1025, y=625)
+
+submit_button = tk.Button(text='Получить решение', font=15)
+submit_button.place(x=950, y=660)
+
+cancel_button = tk.Button(text='Отмена', font=15)
+cancel_button.place(x=1150, y=660)
 
 main_window.mainloop()
+

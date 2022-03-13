@@ -10,7 +10,7 @@ from tkinter import ttk
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
-CANVAS_WIDTH = 1000
+CANVAS_WIDTH = 950
 CANVAS_HEIGHT = 700
 
 PADDING = 15
@@ -21,25 +21,24 @@ TO_CHANGE = False
 
 
 def error_handler(number: int, coordinates_1: list, coordinates_2: list):
-    match number:
-        case 1:
-            tmb.showinfo(title='Решение не найдено',
-                         message='Точки с координатами {} расположены на '
-                                 'одной прямой.\n'.format(coordinates_1))
-        case 2:
-            tmb.showinfo(title='Решение не найдено',
-                         message='Точки с координатами {} расположены на '
-                                 'одной прямой.\n'.format(coordinates_2))
-        case 3:
-            tmb.showinfo(title='Решение не найдено',
-                         message='Окружность с координатами {} расположена '
-                                 'внутри окружности с координатами '
-                                 '{}.\n'.format(coordinates_1, coordinates_2))
-        case 4:
-            tmb.showinfo(title='Решение не найдено',
-                         message='Окружность с координатами {} расположена '
-                                 'внутри окружности с координатами '
-                                 '{}.\n'.format(coordinates_2, coordinates_1))
+    if number == 1:
+        tmb.showinfo(title='Решение не найдено',
+                     message='Точки с координатами {} расположены на '
+                             'одной прямой.\n'.format(coordinates_1))
+    if number == 2:
+        tmb.showinfo(title='Решение не найдено',
+                     message='Точки с координатами {} расположены на '
+                             'одной прямой.\n'.format(coordinates_2))
+    if number == 3:
+        tmb.showinfo(title='Решение не найдено',
+                     message='Окружность с координатами {} расположена '
+                             'внутри окружности с координатами '
+                             '{}.\n'.format(coordinates_1, coordinates_2))
+    if number == 4:
+        tmb.showinfo(title='Решение не найдено',
+                     message='Окружность с координатами {} расположена '
+                             'внутри окружности с координатами '
+                             '{}.\n'.format(coordinates_2, coordinates_1))
 
 
 def add_coordinate():
@@ -105,6 +104,8 @@ def change_row():
     row_id = tree.focus()
 
     if row_id == '':
+        tmb.showerror(title='Ошибка!', message='Не выбрана координата, '
+                                               'которую нужно изменить.')
         return
 
     TO_CHANGE = True
@@ -144,7 +145,7 @@ def change_set():
         table_1.place_forget()
         vsb_1.place_forget()
         table_2.place(x=20, y=270)
-        vsb_2.place(x=240, y=270, height=230)
+        vsb_2.place(x=285, y=270, height=230)
 
         change_set_button['text'] = 'Редактировать 1-е множество'
 
@@ -153,7 +154,7 @@ def change_set():
         table_2.place_forget()
         vsb_2.place_forget()
         table_1.place(x=20, y=270)
-        vsb_1.place(x=240, y=270, height=230)
+        vsb_1.place(x=285, y=270, height=230)
 
         change_set_button['text'] = 'Редактировать 2-е множество'
 
@@ -388,27 +389,27 @@ main_canvas.pack(side='right')
 
 table_1 = ttk.Treeview(main_form, height=10, columns=('x', 'y'),
                        show='headings')
-table_1.column("#1", anchor='center', stretch=False, width=100)
+table_1.column("#1", anchor='center', stretch=False, width=130)
 table_1.heading('x', text='X')
-table_1.column("#2", anchor='center', stretch=False, width=100)
+table_1.column("#2", anchor='center', stretch=False, width=130)
 table_1.heading('y', text='Y')
 table_1.place(x=20, y=270)
 
 vsb_1 = ttk.Scrollbar(main_form, orient="vertical", command=table_1.yview)
-vsb_1.place(x=240, y=270, height=230)
+vsb_1.place(x=285, y=270, height=230)
 table_1.configure(yscrollcommand=vsb_1.set)
 
 table_2 = ttk.Treeview(main_form, height=10, columns=('x', 'y'),
                        show='headings')
-table_2.column("#1", anchor='center', stretch=False, width=100)
+table_2.column("#1", anchor='center', stretch=False, width=130)
 table_2.heading('x', text='X')
-table_2.column("#2", anchor='center', stretch=False, width=100)
+table_2.column("#2", anchor='center', stretch=False, width=130)
 table_2.heading('y', text='Y')
 
 vsb_2 = ttk.Scrollbar(main_form, orient="vertical", command=table_2.yview)
 table_2.configure(yscrollcommand=vsb_2.set)
 
-add_entry = tk.Entry(width=23, justify='center', relief='sunken',
+add_entry = tk.Entry(width=20, justify='center', relief='sunken',
                      font='Calibri 15 bold')
 add_entry.place(x=20, y=30)
 add_entry.bind('<Return>', enter_handler)
@@ -438,7 +439,7 @@ task = tk.Label(text='На плоскости заданы два\nмножес�
                 'различные точки одного и\nтого же множества, для которой\n '
                 'площадь четырехугольника,\nобразованного центрами\nокружностей'
                 ' и точками касания\nобщей внешней\nкасательной, максимальна.',
-                font=10, width=27)
+                font=10, width=30)
 task.place(x=20, y=500)
 
 main_form.mainloop()
