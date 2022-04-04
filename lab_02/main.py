@@ -1,7 +1,19 @@
 import tkinter as tk
 import graphics_math as gm
+import objects as obj
 
 from constants import *
+
+
+building = obj.Rectangle([[-100, -80], [-100, 80], [100, 80], [100, -80]])
+roof = obj.Triangle([[-100, 80], [0, 130], [100, 80]])
+roof_window = obj.Rectangle([[-15, 90], [-15, 110], [15, 110], [15, 90]])
+roof_window_lattice = obj.Plus([[-15, 100], [0, 110], [15, 100], [0, 90]])
+left_window = obj.Oval([[-85, 35], [-55, 65]])
+left_window_lattice = obj.Plus([[-85, 50], [-70, 35], [-55, 50], [-70, 65]])
+door = obj.Oval([[30, -50], [70, 40]])
+door_rectangle = obj.Rectangle([[30, -5], [50, 40], [70, -5], [50, -50]])
+door_lattice = obj.Plus([[30, -5], [50, -50], [70, -5], [50, 40]])
 
 
 def _draw_house():
@@ -20,6 +32,30 @@ def _draw_house():
                              main_canvas)
     door_rectangle.draw([CANVAS_WIDTH, CANVAS_HEIGHT], 'purple', main_canvas)
     door_lattice.draw([CANVAS_WIDTH, CANVAS_HEIGHT], 'purple', main_canvas)
+
+
+def _draw_init_house():
+    global building
+    global roof
+    global roof_window
+    global roof_window_lattice
+    global left_window
+    global left_window_lattice
+    global door
+    global door_rectangle
+    global door_lattice
+
+    building = obj.Rectangle([[-100, -80], [-100, 80], [100, 80], [100, -80]])
+    roof = obj.Triangle([[-100, 80], [0, 130], [100, 80]])
+    roof_window = obj.Rectangle([[-15, 90], [-15, 110], [15, 110], [15, 90]])
+    roof_window_lattice = obj.Plus([[-15, 100], [0, 110], [15, 100], [0, 90]])
+    left_window = obj.Oval([[-85, 35], [-55, 65]])
+    left_window_lattice = obj.Plus([[-85, 50], [-70, 35], [-55, 50], [-70, 65]])
+    door = obj.Oval([[30, -50], [70, 40]])
+    door_rectangle = obj.Rectangle([[30, -5], [50, 40], [70, -5], [50, -50]])
+    door_lattice = obj.Plus([[30, -5], [50, -50], [70, -5], [50, 40]])
+    
+    _draw_house()
 
 
 def _transfer(cancel=False):
@@ -92,8 +128,14 @@ def _scale(cancel=False):
     _draw_house()
 
     if not cancel:
-        STEPS_LIST.append([SCALE, 1 / float(scale_entry_x.get()),
-                           1 / float(scale_entry_y.get()),
+        scale_x = float(scale_entry_x.get())
+        scale_y = float(scale_entry_y.get())
+
+        if abs(scale_x) <= EPS or abs(scale_y) <= EPS:
+            STEPS_LIST.append([INIT])
+        else:
+            STEPS_LIST.append([SCALE, 1 / scale_x,
+                           1 / scale_y,
                            float(center_entry_x.get()),
                            float(center_entry_y.get())])
 
@@ -278,6 +320,9 @@ def _cancel():
         center_entry_y.delete(0, 'end')
         center_entry_y.insert(0, y_c_tmp)
 
+    if step[0] == INIT:
+        _draw_init_house()
+
 
 def _cancel_all():
     for i in range(len(STEPS_LIST)):
@@ -286,7 +331,7 @@ def _cancel_all():
 
 main_window = tk.Tk()
 main_window.title('Лабораторная работа #2')
-main_window.geometry(f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}+150+150')
+main_window.geometry(f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}')
 main_window.resizable(width=False, height=False)
 
 main_window.bind('<Button-1>', _entries_init)
@@ -298,82 +343,86 @@ main_canvas.pack(side='top')
 # Центр масштабирования/поворота
 
 center_label = tk.Label(text='Центр масштабирования/поворота', font=15)
-center_label.place(x=20, y=960)
-
+center_label.place(x=20, y=820)
+# 820 - 560 = 260
 center_label_x = tk.Label(text='Xc', font=15)
-center_label_x.place(x=60, y=605)
+center_label_x.place(x=60, y=865)
 
 center_label_y = tk.Label(text='Yc', font=15)
-center_label_y.place(x=60, y=645)
+center_label_y.place(x=60, y=905)
 
 center_entry_x = tk.Entry(font='Calibri 15', width=10, justify='center')
-center_entry_x.place(x=100, y=600)
+center_entry_x.place(x=100, y=860)
 
 center_entry_y = tk.Entry(font='Calibri 15', width=10, justify='center')
-center_entry_y.place(x=100, y=640)
+center_entry_y.place(x=100, y=900)
 
-'''Перенос'''
+# Перенос
 
 transfer_label = tk.Label(text='Перенос', font=15)
-transfer_label.place(x=405, y=560)
+transfer_label.place(x=490, y=820)
 
 transfer_label_x = tk.Label(text='dX', font=15)
-transfer_label_x.place(x=360, y=605)
+transfer_label_x.place(x=425, y=865)
 
 transfer_label_y = tk.Label(text='dY', font=15)
-transfer_label_y.place(x=360, y=645)
+transfer_label_y.place(x=425, y=905)
 
 transfer_entry_x = tk.Entry(font='Calibri 15', width=10, justify='center')
-transfer_entry_x.place(x=390, y=600)
+transfer_entry_x.place(x=465, y=860)
 
 transfer_entry_y = tk.Entry(font='Calibri 15', width=10, justify='center')
-transfer_entry_y.place(x=390, y=640)
+transfer_entry_y.place(x=465, y=900)
 
-transfer_button = tk.Button(text='Перенести', font=15, command=_transfer)
-transfer_button.place(x=390, y=680)
+transfer_button = tk.Button(text='Перенести', font=15, 
+                            width=11, command=_transfer)
+transfer_button.place(x=465, y=940)
 
-'''Масштабирование'''
+# Масштабирование
 
 scale_label = tk.Label(text='Масштабирование', font=15)
-scale_label.place(x=641, y=560)
+scale_label.place(x=760, y=820)
 
 scale_label_x = tk.Label(text='Kx', font=15)
-scale_label_x.place(x=640, y=605)
+scale_label_x.place(x=715, y=865)
 
 scale_label_y = tk.Label(text='Ky', font=15)
-scale_label_y.place(x=640, y=645)
+scale_label_y.place(x=715, y=905)
 
-scale_entry_x = tk.Entry(font='Calibri 15', width=10, justify='center')
-scale_entry_x.place(x=660, y=600)
+scale_entry_x = tk.Entry(font='Calibri 15', width=12, justify='center')
+scale_entry_x.place(x=755, y=860)
 
-scale_entry_y = tk.Entry(font='Calibri 15', width=10, justify='center')
-scale_entry_y.place(x=660, y=640)
+scale_entry_y = tk.Entry(font='Calibri 15', width=12, justify='center')
+scale_entry_y.place(x=755, y=900)
 
-scale_button = tk.Button(text='Масштабировать', font=15, command=_scale)
-scale_button.place(x=643, y=680)
+scale_button = tk.Button(text='Масштабировать', font=15,
+                         width=13, command=_scale)
+scale_button.place(x=755, y=940)
 
-'''Поворот'''
+# Поворот
 
 rotate_label = tk.Label(text='Поворот', font=15)
-rotate_label.place(x=920, y=560)
+rotate_label.place(x=1120, y=820)
 
-rotate_entry = tk.Entry(font='Calibri 15', width=10, justify='center')
-rotate_entry.place(x=900, y=600)
+rotate_entry = tk.Entry(font='Calibri 15', width=12, justify='center')
+rotate_entry.place(x=1080, y=860)
 
 rotate_label_phi = tk.Label(text='α', font=20)
-rotate_label_phi.place(x=870, y=605)
+rotate_label_phi.place(x=1050, y=865)
 
-rotate_button = tk.Button(text='Повернуть', font=15, command=_rotate)
-rotate_button.place(x=905, y=680)
+rotate_button = tk.Button(text='Повернуть', font=15,
+                          width=13, command=_rotate)
+rotate_button.place(x=1085, y=940)
 
-'''Получить решение'''
+# Кнопки отмены и возврата
 
 cancel_button = tk.Button(text='Вернуться в начало', font=15,
-                          command=_cancel_all)
-cancel_button.place(x=1100, y=600)
+                          width=23, command=_cancel_all)
+cancel_button.place(x=1400, y=860)
 
-cancel_button = tk.Button(text='Отменить шаг', font=15, command=_cancel)
-cancel_button.place(x=1100, y=650)
+cancel_button = tk.Button(text='Вернуться на один шаг', font=15,
+                          width=23, command=_cancel)
+cancel_button.place(x=1400, y=910)
 
 _entries_init(None)
 
