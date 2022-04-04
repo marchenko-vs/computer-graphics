@@ -295,10 +295,10 @@ main_canvas = tk.Canvas(width=CANVAS_WIDTH, height=CANVAS_HEIGHT,
                         background='white')
 main_canvas.pack(side='top')
 
-'''Центр масштабирования/поворота'''
+# Центр масштабирования/поворота
 
 center_label = tk.Label(text='Центр масштабирования/поворота', font=15)
-center_label.place(x=20, y=560)
+center_label.place(x=20, y=960)
 
 center_label_x = tk.Label(text='Xc', font=15)
 center_label_x.place(x=60, y=605)
