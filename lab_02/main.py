@@ -4,16 +4,18 @@ import objects as obj
 
 from constants import *
 
-
 building = obj.Rectangle([[-100, -80], [-100, 80], [100, 80], [100, -80]])
 roof = obj.Triangle([[-100, 80], [0, 130], [100, 80]])
 roof_window = obj.Rectangle([[-15, 90], [-15, 110], [15, 110], [15, 90]])
-roof_window_lattice = obj.Plus([[-15, 100], [0, 110], [15, 100], [0, 90]])
+roof_window_lattice = obj.Lattice([[-15, 100], [0, 110], [15, 100], [0, 90]])
 left_window = obj.Oval([[-85, 35], [-55, 65]])
-left_window_lattice = obj.Plus([[-85, 50], [-70, 35], [-55, 50], [-70, 65]])
+left_window_lattice = obj.Lattice([[-85, 50], [-70, 35], [-55, 50], [-70, 65]])
 door = obj.Oval([[30, -50], [70, 40]])
 door_rectangle = obj.Rectangle([[30, -5], [50, 40], [70, -5], [50, -50]])
-door_lattice = obj.Plus([[30, -5], [50, -50], [70, -5], [50, 40]])
+door_lattice = obj.Lattice([[30, -5], [50, -50], [70, -5], [50, 40]])
+center_point = obj.CenterPoint(building.get_left_down(),
+                               building.get_right_up(),
+                               roof.get_up())
 
 
 def _draw_house():
@@ -33,6 +35,8 @@ def _draw_house():
     door_rectangle.draw([CANVAS_WIDTH, CANVAS_HEIGHT], 'purple', main_canvas)
     door_lattice.draw([CANVAS_WIDTH, CANVAS_HEIGHT], 'purple', main_canvas)
 
+    center_point.print([CANVAS_WIDTH, CANVAS_HEIGHT], main_canvas)
+
 
 def _draw_init_house():
     global building
@@ -44,17 +48,23 @@ def _draw_init_house():
     global door
     global door_rectangle
     global door_lattice
+    global center_point
 
     building = obj.Rectangle([[-100, -80], [-100, 80], [100, 80], [100, -80]])
     roof = obj.Triangle([[-100, 80], [0, 130], [100, 80]])
     roof_window = obj.Rectangle([[-15, 90], [-15, 110], [15, 110], [15, 90]])
-    roof_window_lattice = obj.Plus([[-15, 100], [0, 110], [15, 100], [0, 90]])
+    roof_window_lattice = obj.Lattice(
+        [[-15, 100], [0, 110], [15, 100], [0, 90]])
     left_window = obj.Oval([[-85, 35], [-55, 65]])
-    left_window_lattice = obj.Plus([[-85, 50], [-70, 35], [-55, 50], [-70, 65]])
+    left_window_lattice = obj.Lattice(
+        [[-85, 50], [-70, 35], [-55, 50], [-70, 65]])
     door = obj.Oval([[30, -50], [70, 40]])
     door_rectangle = obj.Rectangle([[30, -5], [50, 40], [70, -5], [50, -50]])
-    door_lattice = obj.Plus([[30, -5], [50, -50], [70, -5], [50, 40]])
-    
+    door_lattice = obj.Lattice([[30, -5], [50, -50], [70, -5], [50, 40]])
+    center_point = obj.CenterPoint(building.get_left_down(),
+                                   building.get_right_up(),
+                                   roof.get_up())
+
     _draw_house()
 
 
@@ -79,6 +89,8 @@ def _transfer(cancel=False):
                           transfer_entry_x, transfer_entry_y, main_canvas)
     building.transfer([CANVAS_WIDTH, CANVAS_HEIGHT],
                       transfer_entry_x, transfer_entry_y, main_canvas)
+    center_point.transfer([CANVAS_WIDTH, CANVAS_HEIGHT],
+                          transfer_entry_x, transfer_entry_y, main_canvas)
 
     _draw_house()
 
@@ -124,6 +136,10 @@ def _scale(cancel=False):
                    scale_entry_x, scale_entry_y,
                    center_entry_x, center_entry_y,
                    main_canvas)
+    center_point.scale([CANVAS_WIDTH, CANVAS_HEIGHT],
+                       scale_entry_x, scale_entry_y,
+                       center_entry_x, center_entry_y,
+                       main_canvas)
 
     _draw_house()
 
@@ -135,9 +151,9 @@ def _scale(cancel=False):
             STEPS_LIST.append([INIT])
         else:
             STEPS_LIST.append([SCALE, 1 / scale_x,
-                           1 / scale_y,
-                           float(center_entry_x.get()),
-                           float(center_entry_y.get())])
+                               1 / scale_y,
+                               float(center_entry_x.get()),
+                               float(center_entry_y.get())])
 
 
 def _rotate(cancel=False):
@@ -177,6 +193,10 @@ def _rotate(cancel=False):
                     rotate_entry,
                     center_entry_x, center_entry_y,
                     main_canvas)
+    center_point.rotate([CANVAS_WIDTH, CANVAS_HEIGHT],
+                        rotate_entry,
+                        center_entry_x, center_entry_y,
+                        main_canvas)
 
     _draw_house()
 
@@ -344,7 +364,7 @@ main_canvas.pack(side='top')
 
 center_label = tk.Label(text='Центр масштабирования/поворота', font=15)
 center_label.place(x=20, y=820)
-# 820 - 560 = 260
+
 center_label_x = tk.Label(text='Xc', font=15)
 center_label_x.place(x=60, y=865)
 
@@ -374,7 +394,7 @@ transfer_entry_x.place(x=465, y=860)
 transfer_entry_y = tk.Entry(font='Calibri 15', width=10, justify='center')
 transfer_entry_y.place(x=465, y=900)
 
-transfer_button = tk.Button(text='Перенести', font=15, 
+transfer_button = tk.Button(text='Перенести', font=15,
                             width=11, command=_transfer)
 transfer_button.place(x=465, y=940)
 

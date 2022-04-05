@@ -4,7 +4,55 @@ import math
 from constants import *
 
 
-class Plus:
+class CenterPoint:
+    def __init__(self, left_down: list, right_up: list, max_up: list):
+        self.coordinates = [round(((left_down[0] + right_up[0]) / 2), 2),
+                            round((((left_down[1] + right_up[1]) / 2) +
+                                   (max_up[1] - right_up[1]) / 2), 2)]
+
+    def print(self, canvas_size: list, canvas_name):
+        canvas_name.create_text(self.coordinates[0] + canvas_size[0] / 2,
+                                -self.coordinates[1] + canvas_size[1] / 2,
+                                text='({:.1f}; {:.1f})'.format(
+                                    self.coordinates[0],
+                                    self.coordinates[1]),
+                                font="Calibri 10")
+
+    def transfer(self, canvas_size: list,
+                 entry_d_x_name, entry_d_y_name, canvas_name):
+        d_x = float(entry_d_x_name.get())
+        d_y = float(entry_d_y_name.get())
+
+        self.coordinates = gm.transfer_point(self.coordinates[0],
+                                             self.coordinates[1],
+                                             d_x, d_y)
+
+    def scale(self, canvas_size: list,
+              entry_k_x_name, entry_k_y_name,
+              entry_x_c_name, entry_y_c_name, canvas_name):
+        k_x = float(entry_k_x_name.get())
+        k_y = float(entry_k_y_name.get())
+
+        x_c = float(entry_x_c_name.get())
+        y_c = float(entry_y_c_name.get())
+
+        self.coordinates = gm.scale_point(self.coordinates[0],
+                                          self.coordinates[1],
+                                          k_x, k_y, x_c, y_c)
+
+    def rotate(self, canvas_size: list, entry_phi_name,
+               entry_x_c_name, entry_y_c_name, canvas_name):
+        phi = float(entry_phi_name.get())
+
+        x_c = float(entry_x_c_name.get())
+        y_c = float(entry_y_c_name.get())
+
+        self.coordinates = gm.rotate_point(self.coordinates[0],
+                                              self.coordinates[1],
+                                              phi, x_c, y_c)
+
+
+class Lattice:
     def __init__(self, coordinates: list):
         self.coordinates = coordinates.copy()
 
@@ -101,6 +149,12 @@ class Rectangle:
                                                   self.coordinates[i][1],
                                                   phi, x_c, y_c)
 
+    def get_left_down(self):
+        return self.coordinates[0]
+
+    def get_right_up(self):
+        return self.coordinates[2]
+
 
 class Triangle:
     def __init__(self, coordinates: list):
@@ -150,6 +204,9 @@ class Triangle:
                                                   self.coordinates[i][1],
                                                   phi, x_c, y_c)
 
+    def get_up(self):
+        return self.coordinates[1]
+
 
 class Oval:
     def __init__(self, coordinates: list):
@@ -168,7 +225,7 @@ class Oval:
 
         canvas_name.create_polygon(tuple(tmp),
                                    fill='white',
-                                   outline=color)
+                                   outline=color, smooth=True)
 
     def rotate(self, canvas_size: list, entry_phi_name,
                entry_x_c_name, entry_y_c_name, canvas_name):
