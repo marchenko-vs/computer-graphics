@@ -44,14 +44,11 @@ def rotate_point(x: float, y: float, phi: float, x_c: float,
                  y_c: float) -> list:
     teta = phi * math.pi / 180.0
 
-    x_c_tmp = 0
-    y_c_tmp = 0
+    x_tmp = x - x_c
+    y_tmp = y - y_c
 
-    x_tmp = x - x_c_tmp
-    y_tmp = y - y_c_tmp
-
-    x_res = x_tmp * math.cos(teta) - y_tmp * math.sin(teta)
-    y_res = x_tmp * math.sin(teta) + y_tmp * math.cos(teta)
+    x_res = x_c + x_tmp * math.cos(teta) - y_tmp * math.sin(teta)
+    y_res = y_c + x_tmp * math.sin(teta) + y_tmp * math.cos(teta)
 
     return [x_res, y_res]
 

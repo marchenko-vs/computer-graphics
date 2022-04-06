@@ -11,6 +11,11 @@ class CenterPoint:
                                    (max_up[1] - right_up[1]) / 2), 2)]
 
     def print(self, canvas_size: list, canvas_name):
+        if abs(self.coordinates[0]) <= EPS:
+            self.coordinates[0] = 0.0
+        if abs(self.coordinates[1]) <= EPS:
+            self.coordinates[1] = 0.0
+
         canvas_name.create_text(self.coordinates[0] + canvas_size[0] / 2,
                                 -self.coordinates[1] + canvas_size[1] / 2,
                                 text='({:.1f}; {:.1f})'.format(
