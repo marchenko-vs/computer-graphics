@@ -5,19 +5,8 @@ import os
 import tkinter as tk
 import tkinter.messagebox as tmb
 
+from constants import *
 from tkinter import ttk
-
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
-
-CANVAS_WIDTH = 950
-CANVAS_HEIGHT = 700
-
-PADDING = 15
-
-CURRENT_SET = 1
-
-TO_CHANGE = False
 
 
 def error_handler(number: int, coordinates_1: list, coordinates_2: list):
@@ -162,28 +151,25 @@ def change_set():
 
 
 def solve():
-    # initial_set_1 = []
-    # for line in table_1.get_children():
-    #     tmp = list()
-    #
-    #     for value in table_1.item(line)['values']:
-    #         tmp.append(float(value))
-    #
-    #     initial_set_1.append(tmp)
-    #     tmp = []
-    #
-    # initial_set_2 = []
-    # for line in table_2.get_children():
-    #     tmp = list()
-    #
-    #     for value in table_2.item(line)['values']:
-    #         tmp.append(float(value))
-    #
-    #     initial_set_2.append(tmp)
-    #     tmp = []
+    initial_set_1 = []
+    for line in table_1.get_children():
+        tmp = list()
 
-    initial_set_2 = [[-50, -70], [-30, 10], [50, -30]]
-    initial_set_1 = [[150, 39], [200, -30], [230, 20]]
+        for value in table_1.item(line)['values']:
+            tmp.append(float(value))
+
+        initial_set_1.append(tmp)
+        tmp = []
+
+    initial_set_2 = []
+    for line in table_2.get_children():
+        tmp = list()
+
+        for value in table_2.item(line)['values']:
+            tmp.append(float(value))
+
+        initial_set_2.append(tmp)
+        tmp = []
 
     if len(initial_set_1) < 3:
         tmb.showerror(title='Ошибка!', message='Введено менее трех '
@@ -435,10 +421,10 @@ read_button = tk.Button(text='Получить решение', command=solve, w
 read_button.place(x=20, y=230)
 
 task = tk.Label(text='На плоскости заданы два\nмножества точек. Найти пару\n'
-                'окружностей, каждая из которых\nпроходит хотя бы через три\n'
-                'различные точки одного и\nтого же множества, для которой\n '
-                'площадь четырехугольника,\nобразованного центрами\nокружностей'
-                ' и точками касания\nобщей внешней\nкасательной, максимальна.',
+                     'окружностей, каждая из которых\nпроходит хотя бы через три\n'
+                     'различные точки одного и\nтого же множества, для которой\n '
+                     'площадь четырехугольника,\nобразованного центрами\nокружностей'
+                     ' и точками касания\nобщей внешней\nкасательной, максимальна.',
                 font=10, width=30)
 task.place(x=20, y=500)
 

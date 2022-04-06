@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-EPS = 1e-3
+from constants import *
 
 
 def on_one_line(coordinates: list) -> bool:
@@ -51,14 +51,6 @@ def get_circle_center(coordinates: list) -> list:
     b = (x_12 * z_3 + x_23 * z_1 + x_31 * z_2) / \
         (2 * (x_12 * y_31 - y_12 * x_31))
 
-    # try:
-    #     a = - ((y_12 * z_3 + y_23 * z_1 + y_31 * z_2) /
-    #            (2 * (x_12 * y_31 - y_12 * x_31)))
-    #     b = (x_12 * z_3 + x_23 * z_1 + x_31 * z_2) / \
-    #         (2 * (x_12 * y_31 - y_12 * x_31))
-    # except ZeroDivisionError:
-    #     return [None, None]
-
     return [a, b]
 
 
@@ -89,7 +81,7 @@ def get_triangle_area(coordinates: list) -> float:
     half_perimeter = (ab + bc + ca) / 2
 
     triangle_area = math.sqrt(half_perimeter * (half_perimeter - ab) *
-                               (half_perimeter - bc) * (half_perimeter - ca))
+                              (half_perimeter - bc) * (half_perimeter - ca))
 
     return triangle_area
 
@@ -104,8 +96,8 @@ def get_rectangle_area(coordinates: list) -> float:
     return rectangle_area
 
 
-def get_tangent_coefficients(circle_center_1: list, circle_center_2: list,
-                             radius_1: float, radius_2: float) -> list:
+def get_tangent_coefficients(circle_center_2: list, radius_1: float,
+                             radius_2: float) -> list:
     d_1 = radius_1
     d_2 = radius_2
 
@@ -295,9 +287,11 @@ def draw_segment(x_0: float, y_0: float, x_1: float, y_1: float, x_min: float,
                             fill=fill, width=width)
 
     canvas_name.create_text(x_0, y_0 + 20,
-                            text='({:.2f}; {:.2f})'.format(x_t_1, y_t_1), font=8)
+                            text='({:.2f}; {:.2f})'.format(x_t_1, y_t_1),
+                            font=8)
     canvas_name.create_text(x_1, y_1 + 20,
-                            text='({:.2f}; {:.2f})'.format(x_t_2, y_t_2), font=8)
+                            text='({:.2f}; {:.2f})'.format(x_t_2, y_t_2),
+                            font=8)
 
 
 def draw_axes(canvas_size: list, x_min: float, y_max: float, k: float,
