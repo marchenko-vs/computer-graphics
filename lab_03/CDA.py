@@ -2,7 +2,6 @@
 
 #from math import round
 
-
 def cda_test(ps, pf):
     dx = abs(pf[0] - ps[0])
     dy = abs(pf[1] - ps[1])

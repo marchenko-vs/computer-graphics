@@ -1,14 +1,20 @@
-import matplotlib.pyplot as plt
-import time
 from tkinter import *
 from tkinter import messagebox
-
-from bresenham import *
-from constants import *
-from dda import cda_test, draw_line_cda
-from graphics_math import sign, get_rgb_intensity
 from math import fabs, ceil, radians, cos, sin, floor
-from wu import vu_test
+import matplotlib.pyplot as plt
+import time
+
+from CDA import cda_test, draw_line_cda
+from BresenhamFloat import float_test, draw_line_brez_float
+from BresenhamInt import int_test, draw_line_brez_int
+from BresenhamSmooth import smoth_test
+from Wu import vu_test
+
+from calculations import sign, get_rgb_intensity
+
+
+canvW, canvH = 1500, 990
+line_r = 150
 
 
 def draw_line_brez_smoth(canvas, ps, pf, fill):
@@ -127,76 +133,72 @@ def draw_line_vu(canvas, ps, pf, fill):
 
 # Получение параметров для отрисовки
 def draw(test_mode):
-    choice = method_list.curselection()
-
-    if len(choice) == 1:
+    choise = method_list.curselection()
+    if len(choise) == 1:
         xs, ys = fxs.get(), fys.get()
         xf, yf = fxf.get(), fyf.get()
-
         if not xs and not ys:
-            messagebox.showwarning('Ошибка ввода',
-                                   'Не заданы координаты начала отрезка!')
+            messagebox.shorerror('Ошибка!',
+                                   'Не заданы координаты начала отрезка.')
         elif not xs or not ys:
-            messagebox.showwarning('Ошибка ввода',
-                                   'Не задана одна из координат начала отрезка!')
+            messagebox.shorerror('Ошибка!',
+                                   'Не задана одна из координат начала отрезка.')
         elif not xf and not yf:
-            messagebox.showwarning('Ошибка ввода',
-                                   'Не заданы координаты конца отрезка!')
+            messagebox.shorerror('Ошибка!',
+                                   'Не заданы координаты конца отрезка.')
         elif not xf or not yf:
-            messagebox.showwarning('Ошибка ввода',
-                                   'Не задана одна из координат конца отрезка!')
+            messagebox.shorerror('Ошибка!',
+                                   'Не задана одна из координат конца отрезка.')
         else:
-            #try:
+            try:
                 xs, ys = round(float(xs)), round(float(ys))
                 xf, yf = round(float(xf)), round(float(yf))
-
                 if xs != xf or ys != yf:
                     if not test_mode:
-                        if choice[0] == 5:
+                        if choise[0] == 5:
                             canvas.create_line([xs, ys], [xf, yf], fill=line_color)
                         else:
-                            funcs[choice[0]](canvas, [xs, ys], [xf, yf], fill=line_color)
+                            funcs[choise[0]](canvas, [xs, ys], [xf, yf], fill=line_color)
                     else:
                         angle = fangle.get()
                         if angle:
                             try:
-                                angle = int(angle)
+                                angle = float(angle)
                             except:
                                 messagebox.showerror('Ошибка!',
-                                                     'Введено нечисловое значение для шага анализа!')
+                                                      'Введено нечисловое значение угла поворота.')
                             if angle:
-                                test(1, choice[0], funcs[choice[0]], angle, [xs, ys], [xf, yf])
+                                angle = round(angle)
+                                test(1, choise[0], funcs[choise[0]], angle, [xs, ys], [xf, yf])
                             else:
-                                messagebox.showwarning('Ошибка!',
-                                                       'Задано нулевое значение для угла поворота!')
+                                messagebox.showerror('Ошибка!',
+                                                           'Задано нулевое значение для угла поворота.')
 
                         else:
-                            messagebox.showwarning('Ошибка ввода',
-                                                   'Не задано значение для шага анализа!')
+                            messagebox.showerror('Ошибка!',
+                                                   'Не задано значение угла поворота.')
                 else:
-                    messagebox.showwarning('Ошибка ввода',
-                                           'Начало и конец отрезка совпадают!')
-            #except:
-                #messagebox.showwarning('Ошибка ввода',
-                #                       'Нечисловое значение для параметров отрезка!')
-    elif not len(choice):
+                    messagebox.showerror('Ошибка!',
+                                           'Начало и конец отрезка совпадают.')
+            except ValueError:
+                messagebox.showerror('Ошибка!',
+                                     'Введено нечисловое значение одной из координат начала или конца отрезка.')
+    elif not len(choise):
         messagebox.showerror('Ошибка!',
-                             'Не выбран алгоритм построения отрезка.')
+                               'Не выбран метод построения отрезка.')
     else:
         messagebox.showerror('Ошибка!',
-                             'Выбрано более одного алгоритма простроения отрезка.')
+                               'Выбрано более одного метода простроения отрезка.')
 
 
 # Получение параметров для анализа
 def analyze(mode):
     try:
         length = len_line.get()
-
         if length:
-            length = int(length)
+            length = round(float(length))
         else:
             length = 100
-
         if not mode:
             time_bar(length)
         else:
@@ -205,16 +207,15 @@ def analyze(mode):
                 if ind[-1] != 5:
                     smoth_analyze(ind, length)
                 else:
-                    messagebox.showwarning('Предупреждение',
-                                           'Стандартный метод не может '
-                                           'быть проанализирован на ступенчатость!')
+                    messagebox.showwarning('Предупреждение!',
+                                           'Библиотечный метод не может '
+                                           'быть проанализирован на ступенчатость.')
             else:
-                messagebox.showwarning('Предупреждение',
-                                       'Не выбрано ни одного'
-                                       'метода построения отрезка!')
+                messagebox.showwarning('Предупреждение!',
+                                       'Не выбран метод построения отрезка.')
     except ValueError:
         messagebox.showerror('Ошибка!',
-                             'Длина отрезка должна быть целым числом.')
+                             'Введено нечисловое значение длины отрезка.')
 
 
 # замер времени
@@ -223,7 +224,6 @@ def test(flag, ind, method, angle, pb, pe):
 
     total = 0
     steps = int(360 // angle)
-
     for i in range(steps):
         cur1 = time.time()
         if flag == 0:
@@ -251,12 +251,13 @@ def time_bar(length):
         times.append(test(0, i, funcs[i], angle, pb, pe))
     clean()
     Y = range(len(times))
-    L = ('Digital\ndifferential\nanalyzer', 'Bresenham\n(real coeffs)',
-         'Bresenham\n(int coeffs)', 'Bresenham\n(smooth)', 'Wu')
+    L = ('ЦДА', 'Брезенхем\n(действительные\nданные)',
+         'Брезенхем\n(целочисленные\nданные)', 'Брезенхем\n(устранение\nступенчатости)', 'Ву')
     plt.bar(Y, times, align='center')
     plt.xticks(Y, L)
-    plt.ylabel("Work time in sec. (line len. " + str(length) + ")")
+    plt.ylabel("Время в секундах (длина отрезка - " + str(length) + " пикселей)")
     plt.show()
+
 
 # Поворот точки для сравнения ступенчатости
 def turn_point(angle, p, center):
@@ -264,15 +265,16 @@ def turn_point(angle, p, center):
     p[0] = round(center[0] + (x - center[0]) * cos(angle) + (p[1] - center[1]) * sin(angle))
     p[1] = round(center[1] - (x - center[0]) * sin(angle) + (p[1] - center[1]) * cos(angle))
 
+
 # Анализ ступечатости
 def smoth_analyze(methods, length):
     close_plt()
-    names = ('Digital\ndifferential\nanalyzer', 'Bresenham\n(real coeffs)',
-             'Bresenham\n(int coeffs)', 'Bresenham\n(smooth)', 'Wu')
+    names = ('ЦДА', 'Брезенхем\n(действительные\nданные)',
+             'Брезенхем\n(целочисленные\nданные)', 'Брезенхем\n(устранение\nступенчатости)', 'Ву')
     plt.figure(1)
-    plt.title("Stepping analysis")
-    plt.xlabel("Angle")
-    plt.ylabel("Number of steps(line length " + str(length) + ")")
+    plt.title("Анализ ступенчатости")
+    plt.xlabel("Угол, градусы")
+    plt.ylabel("Количество ступеней (длина отрезка - " + str(length) + " пикселей)")
     plt.grid(True)
     plt.legend(loc='best')
 
@@ -301,7 +303,7 @@ def smoth_analyze(methods, length):
         plt.legend()
     plt.show()
 
-# Оси координат
+
 def draw_axes():
     return
     color = 'gray'
@@ -315,35 +317,33 @@ def draw_axes():
         canvas.create_text(15, i, text=str(abs(i)), fill=color)
         canvas.create_line(0, i, 5, i, fill=color)
 
-# очистка холста
+
 def clean():
     canvas.delete("all")
     draw_axes()
 
-# Справка
+
 def show_info():
-    messagebox.showinfo('Информация.',
-                        'С помощью данной программы можно построить отрезки шестью алгоритмами:\n'
-                        '1. Алгоритмом цифрового дифференциального анализатора.\n'
-                        '2. Алгоритмом Брезенхема с действитльными коэффициентами.\n'
-                        '3. Алгоритмом Брезенхема с целыми коэффициентами.\n'
-                        '4. Алгоритмом Брезенхема со сглаживанием.\n'
-                        '5. Алгоритмом Ву.\n'
-                        '6. Стандартым алгоритмом из библиотеки.\n\n'
-                        'Для построения отрезка необходимо задать его начало\n'
-                        'и конец и выбрать метод построения из списка предложенных.\n\n'
-                        'Для визуального анализа (построения пучка отрезков)\n'
-                        'необходимо задать начало и конец,\n'
-                        'выбрать метод для анализа,\n'
-                        'а также угол поворота отрезка.\n\n'
+    messagebox.showinfo('Справочная информация.',
+                        'С помощью данной программы можно построить отрезки шестью методами.\n'
+                        '1. Методом цифрового дифференциального анализатора.\n'
+                        '2. Методом Брезенхема с действительными данными.\n'
+                        '3. Методом Брезенхема с целочисленными данными.\n'
+                        '4. Методом Брезенхема со сглаживанием.\n'
+                        '5. Методом Ву.\n'
+                        '6. Стандартым методом из библиотеки.\n\n'
+                        'Для построения отрезка необходимо задать координаты его начала\n'
+                        'и конца и выбрать метод построения из списка предложенных.\n\n'
+                        'Для визуального анализа (построения пучка лучей)\n'
+                        'необходимо задать координаты начала и конца,\n'
+                        'выбрать метод построения отрезка для анализа,\n'
+                        'а также угол поворота отрезков.\n\n'
                         'Для анализа ступенчатости можно выбрать сразу несколько методов.\n'
-                        'Чтобы это сделать, зажмите SHIFT при выборе.\n'
-                        'Анализ ступенчатости и времени исполнения приводится\n'
-                        'в виде графиков pyplot.\n'
+                        'Чтобы это сделать, зажмите клавишу Shift при выборе.\n'
                         'Введите длину отрезка, если хотите сделать анализ программы\n'
                         'при построении отрезков определенной длины.')
 
-# Список методов прорисовки отрезка
+
 def fill_list(lst):
     lst.insert(END, "Цифровой дифференциальный анализатор")
     lst.insert(END, "Брезенхем с действительными данными")
@@ -372,180 +372,194 @@ def close_plt():
     plt.close()
 
 
-main_window = Tk()
-main_window.geometry(f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}+0+0')
-main_window.resizable(width=False, height=False)
-main_window.title('Лабораторная работа #3')
+def close_all():
+    if messagebox.askyesno("Выход", "Вы действительно хотите завершить программу?"):
+        close_plt()
+        root.destroy()
 
-# Коэффициенты для отезка
-coords_frame = Frame(main_window, height=200, width=MENU_WIDTH)
-coords_frame.place(x=10, y=110)
 
-# угол
-angle_frame = Frame(main_window, height=200, width=MENU_WIDTH)
-angle_frame.place(x=10, y=210)
+root = Tk()
+root.geometry('1900x1000+0+0')
+root.resizable(0, 0)
+root.title('Лабораторная работа #3')
 
-# выбор цвета
-color_frame = Frame(main_window, height=150, width=MENU_WIDTH)
-color_frame.place(x=10, y=300)
+color_menu = "#7586c5"
 
-# сравнение
-comparison_frame = Frame(main_window, height=200, width=MENU_WIDTH)
-comparison_frame.place(x=10, y=750)
+x_menu = 10
+w_menu = 375
 
-# очистить, справка
-menu_frame = Frame(main_window, height=50, width=MENU_WIDTH)
-menu_frame.place(x=10, y=940)
+# Фрейм для выбора цвета
+color_frame = Frame(root, height=400, width=w_menu)
+color_frame.place(x=x_menu, y=740)
 
-# Холст
-canv = Canvas(main_window, width=CANVAS_WIDTH,
-              height=CANVAS_HEIGHT, bg='white')
+canv = Canvas(root, width=canvW, height=canvH, bg='white')
 canvas = canv
-canvas_test = canv # Удалить
-# canv.place(x=0, y=000)
+canvas_test = canv
 canv.pack(side='right')
-center = (CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2)
+center = (375, 200)
 
 # Список алгоритмов
-method_list = Listbox(main_window, selectmode=EXTENDED, font='Calibri 12')
-method_list.place(x=10, y=10, width=MENU_WIDTH, height=130)
+method_list = Listbox(root, selectmode=EXTENDED, font='Calibri 14')
+method_list.place(x=x_menu, y=10, width=w_menu, height=150)
 fill_list(method_list)
+
 funcs = (draw_line_cda, draw_line_brez_float, draw_line_brez_int,
          draw_line_brez_smoth, draw_line_vu, canvas.create_line)
 test_funcs = (cda_test, float_test, int_test, smoth_test, vu_test)
 
 # Координаты начала и конца отрезка
-lb1 = Label(coords_frame, text='Координаты начала отрезка')
-lb2 = Label(coords_frame, text='Координаты конца отрезка')
-lb1.place(x=0, y=5)
-lb2.place(x=0, y=50)
+lb1 = Label(text='Начало отрезка', font='Calibri 14')
+lb1.place(x=130, y=180)
 
-btn_draw = Button(coords_frame, text="Построить",
-                  font='Calibri 15', 
+lbx1 = Label(text='X', font='Calibri 14')
+lbx1.place(x=40, y=220)
+
+fxs = Entry(font='Calibri 14', justify='center')
+fxs.place(x=70, y=220, width=100)
+
+lby1 = Label(text='Y', font='Calibri 14')
+lby1.place(x=190, y=220)
+
+fys = Entry(font='Calibri 14', justify='center')
+fys.place(x=220, y=220, width=100)
+
+lb2 = Label(text='Конец отрезка', font='Calibri 14')
+lb2.place(x=130, y=260)
+
+lbx2 = Label(text='X', font='Calibri 14')
+lbx2.place(x=40, y=300)
+
+fxf = Entry(font='Calibri 14', justify='center')
+fxf.place(x=70, y=300, width=100)
+
+lby2 = Label(text='Y', font='Calibri 14')
+lby2.place(x=190, y=300)
+
+fyf = Entry(font='Calibri 14', justify='center')
+fyf.place(x=220, y=300, width=100)
+
+btn_draw = Button(text="Построить отрезок", font='Calibri 14',
                   command=lambda: draw(0), width=140, height=25)
-btn_draw.place(x=170, y=35, width=100, height=30)
+btn_draw.place(x=110, y=350, width=180, height=40)
 
-lbx1 = Label(coords_frame, text='X:')
-lby1 = Label(coords_frame, text='Y:')
-lbx2 = Label(coords_frame, text='X:')
-lby2 = Label(coords_frame, text='Y:')
-lbx1.place(x=5, y=25)
-lby1.place(x=90, y=25)
-lbx2.place(x=5, y=75)
-lby2.place(x=90, y=75)
+fxs.insert(0, str(canvW / 2))
+fys.insert(0, str(canvH / 2))
 
-fxs = Entry(coords_frame, bg="white")
-fys = Entry(coords_frame, bg="white")
-fxf = Entry(coords_frame, bg="white")
-fyf = Entry(coords_frame, bg="white")
+fxf.insert(0, str(canvW / 2 + line_r))
+fyf.insert(0, str(canvH / 2 + line_r))
 
-fxs.place(x=30, y=25, width=35)
-fys.place(x=115, y=25, width=35)
-fxf.place(x=30, y=75, width=35)
-fyf.place(x=115, y=75, width=35)
+# Поворот
+lb_angle = Label(text="Угол поворота (в градусах)",
+                 font='Calibri 14')
+lb_angle.place(x=90, y=420)
 
-fxs.insert(0, str(CANVAS_WIDTH / 2))
-fys.insert(0, str(CANVAS_HEIGHT / 2))
-fxf.insert(0, str(CANVAS_WIDTH / 2 + line_r))
-fyf.insert(0, str(CANVAS_HEIGHT/2 + line_r))
+fangle = Entry(font='Calibri 14', justify='center')
+fangle.place(x=105, y=460, width=200)
+fangle.insert(0, "15.0")
 
-lb_angle = Label(angle_frame, text="Угол поворота\n(в градусах):")
-lb_angle.place(x=2, y=2)
+btn_viz = Button(text="Построить пучок лучей", 
+                 font='Calibri 14', command=lambda: draw(1))
+btn_viz.place(x=105, y=500, width=200)
 
-fangle = Entry(angle_frame, bg="white")
-fangle.place(x=30, y=40, width=25)
-fangle.insert(0, "15")
+# Анализ алгоритмов
+lb_len = Label(text="Длина отрезка\n(по умолчанию - 100)",
+               font='Calibri 14')
+lb_len.place(x=110, y=560)
 
-btn_viz = Button(angle_frame, text="Спектр", command=lambda: draw(1))
-btn_viz.place(x=120, y=30, width=120, height=25)
+len_line = Entry(font='Calibri 14', justify='center')
+len_line.place(x=110, y=620, width=180)
 
-lb_len = Label(comparison_frame, text="Длина отрезка\n(по умолчанию - 100)",
-               font='Calibri 15')
-lb_len.place(x=75, y=0)
+btn_time = Button(text="Сравнение\nвремени",
+                  font='Calibri 14', command=lambda: analyze(0))
+btn_time.place(x=40, y=660, width=140, height=50)
 
-len_line = Entry(comparison_frame, font='Calibri 15', justify='center')
-len_line.place(x=0, y=60, width=400)
+btn_smoth = Button(text="Сравнение\nступенчатости", 
+                   font='Calibri 14', command=lambda: analyze(1))
+btn_smoth.place(x=210, y=660, width=140, height=50)
 
-btn_time = Button(comparison_frame, text="Временной\nанализ",
-                  font='Calibri 15', command=lambda: analyze(0))
-btn_time.place(x=0, y=90, width=190)
-
-btn_smoth = Button(comparison_frame, text="Сравнение\nступенчатости",
-                   font='Calibri 15', command=lambda: analyze(1))
-btn_smoth.place(x=220, y=90, width=190)
-
-btn_clean = Button(menu_frame, text="Очистить экран", font='Calibri 15',
+# Дополнительные кнопки
+btn_clean = Button(text="Очистить экран", font='Calibri 14',
                    command=clean)
-btn_clean.place(x=0, y=0, width=190)
+btn_clean.place(x=50, y=950, width=140)
 
-btn_help = Button(menu_frame, text="Информация", font='Calibri 15',
+btn_help = Button(text="Информация", font='Calibri 14',
                   command=show_info)
-btn_help.place(x=220, y=0, width=190)
+btn_help.place(x=210, y=950, width=140)
 
-
-# выбор цветов
+# Цвета
 line_color = 'black'
 bg_color = 'white'
 
-size = 15
+size = 30
+
 white_line = Button(color_frame, bg="white", activebackground="white",
                     command=lambda: set_linecolor('white'))
-white_line.place(x=15, y=30, height=size, width=size)
+white_line.place(x=60, y=50, height=size, width=size)
+
 black_line = Button(color_frame, bg="yellow", activebackground="black",
                     command=lambda: set_linecolor("yellow"))
-black_line.place(x=30, y=30, height=size, width=size)
+
+black_line.place(x=90, y=50, height=size, width=size)
+
 red_line = Button(color_frame, bg="orange", activebackground="orange",
                   command=lambda: set_linecolor("orange"))
-red_line.place(x=45, y=30, height=size, width=size)
+red_line.place(x=120, y=50, height=size, width=size)
+
 orange_line = Button(color_frame, bg="red", activebackground="red",
                      command=lambda: set_linecolor("red"))
-orange_line.place(x=60, y=30, height=size, width=size)
+orange_line.place(x=150, y=50, height=size, width=size)
+
 yellow_line = Button(color_frame, bg="purple", activebackground="purple",
                      command=lambda: set_linecolor("purple"))
-yellow_line.place(x=75, y=30, height=size, width=size)
+yellow_line.place(x=180, y=50, height=size, width=size)
+
 green_line = Button(color_frame, bg="darkblue", activebackground="darkblue",
                     command=lambda: set_linecolor("darkblue"))
-green_line.place(x=90, y=30, height=size, width=size)
+green_line.place(x=210, y=50, height=size, width=size)
+
 doger_line = Button(color_frame, bg="darkgreen", activebackground="darkgreen",
                     command=lambda: set_linecolor("darkgreen"))
-doger_line.place(x=105, y=30, height=size, width=size)
+doger_line.place(x=240, y=50, height=size, width=size)
+
 blue_line = Button(color_frame, bg="black", activebackground="black",
                    command=lambda: set_linecolor("black"))
-blue_line.place(x=120, y=30, height=size, width=size)
+blue_line.place(x=270, y=50, height=size, width=size)
 
 white_bg = Button(color_frame, bg="white", activebackground="white",
                   command=lambda: set_bgcolor("white"))
-white_bg.place(x=15, y=110, height=size, width=size)
+white_bg.place(x=60, y=140, height=size, width=size)
 black_bg = Button(color_frame, bg="yellow", activebackground="yellow",
                   command=lambda: set_bgcolor("yellow"))
-black_bg.place(x=30, y=110, height=size, width=size)
+black_bg.place(x=90, y=140, height=size, width=size)
 red_bg = Button(color_frame, bg="orange", activebackground="orange",
                 command=lambda: set_bgcolor("orange"))
-red_bg.place(x=45, y=110, height=size, width=size)
+red_bg.place(x=120, y=140, height=size, width=size)
 orange_bg = Button(color_frame, bg="red", activebackground="red",
                    command=lambda: set_bgcolor("red"))
-orange_bg.place(x=60, y=110, height=size, width=size)
+orange_bg.place(x=150, y=140, height=size, width=size)
 yellow_bg = Button(color_frame, bg="purple", activebackground="purple",
                    command=lambda: set_bgcolor("purple"))
-yellow_bg.place(x=75, y=110, height=size, width=size)
+yellow_bg.place(x=180, y=140, height=size, width=size)
 green_bg = Button(color_frame, bg="darkblue", activebackground="darkblue",
                   command=lambda: set_bgcolor("darkblue"))
-green_bg.place(x=90, y=110, height=size, width=size)
+green_bg.place(x=210, y=140, height=size, width=size)
 dodger_bg = Button(color_frame, bg="darkgreen", activebackground="darkgreen",
                    command=lambda: set_bgcolor("darkgreen"))
-dodger_bg.place(x=105, y=110, height=size, width=size)
+dodger_bg.place(x=240, y=140, height=size, width=size)
+
 blue_bg = Button(color_frame, bg="black", activebackground="black",
                  command=lambda: set_bgcolor("black"))
-blue_bg.place(x=120, y=110, height=size, width=size)
+blue_bg.place(x=270, y=140, height=size, width=size)
 
-lb_line = Label(color_frame, text='Цвет отрезка (текущий:          ): ')
-lb_line.place(x=2, y=5)
+lb_line = Label(color_frame, text='Цвет отрезка (текущий:       )',
+                font='Calibri 14')
+lb_line.place(x=70, y=10)
 
 lb_lcolor = Label(color_frame, bg=line_color)
-lb_lcolor.place(x=137, y=9, width=24, height=12)
+lb_lcolor.place(x=265, y=18, width=15, height=15)
 
-lb_bg = Label(color_frame, text='Цвет фона:')
-lb_bg.place(x=2, y=80)
+lb_bg = Label(color_frame, text='Цвет фона', font='Calibri 14')
+lb_bg.place(x=140, y=100)
 
 draw_axes()
-main_window.mainloop()
+root.mainloop()

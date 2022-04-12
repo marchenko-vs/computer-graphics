@@ -1,4 +1,4 @@
-from graphics_math import sign, get_rgb_intensity
+from calculations import sign, get_rgb_intensity
 from math import fabs, ceil, radians, cos, sin, floor
 
 
