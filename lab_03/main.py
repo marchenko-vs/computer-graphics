@@ -364,56 +364,51 @@ def set_linecolor(color):
     line_color = color
     lb_lcolor.configure(bg=line_color)
 
+
 def close_plt():
     plt.figure(1)
     plt.close()
     plt.figure(2)
     plt.close()
 
-def close_all():
-    if messagebox.askyesno("Выход", "Вы действительно хотите завершить программу?"):
-        close_plt()
-        main_window.destroy()
 
 main_window = Tk()
 main_window.geometry(f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}+0+0')
 main_window.resizable(width=False, height=False)
 main_window.title('Лабораторная работа #3')
 
-color_menu = "#7586c5" # удалить, мне нужен стандартный фон
-
 # Коэффициенты для отезка
-coords_frame = Frame(main_window, height=200, width=w_menu)
+coords_frame = Frame(main_window, height=200, width=MENU_WIDTH)
 coords_frame.place(x=10, y=110)
 
 # угол
-angle_frame = Frame(main_window, height=200, width=w_menu)
+angle_frame = Frame(main_window, height=200, width=MENU_WIDTH)
 angle_frame.place(x=10, y=210)
 
-
 # выбор цвета
-color_frame = Frame(main_window, height=150, width=w_menu)
+color_frame = Frame(main_window, height=150, width=MENU_WIDTH)
 color_frame.place(x=10, y=300)
 
 # сравнение
-comparison_frame = Frame(main_window, height=200, width=w_menu)
-comparison_frame.place(x=10, y=450)
+comparison_frame = Frame(main_window, height=200, width=MENU_WIDTH)
+comparison_frame.place(x=10, y=750)
 
 # очистить, справка
-menu_frame = Frame(main_window, height=50, width=w_menu)
-menu_frame.place(x=10, y=600)
+menu_frame = Frame(main_window, height=50, width=MENU_WIDTH)
+menu_frame.place(x=10, y=940)
 
 # Холст
-canv = Canvas(main_window, width=canvW, height=canvH, bg='white')
+canv = Canvas(main_window, width=CANVAS_WIDTH,
+              height=CANVAS_HEIGHT, bg='white')
 canvas = canv
 canvas_test = canv # Удалить
 # canv.place(x=0, y=000)
 canv.pack(side='right')
-center = (375, 200)
+center = (CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2)
 
 # Список алгоритмов
-method_list = Listbox(main_window, selectmode=EXTENDED)
-method_list.place(x=10, y=10, width=w_menu, height=100)
+method_list = Listbox(main_window, selectmode=EXTENDED, font='Calibri 12')
+method_list.place(x=10, y=10, width=MENU_WIDTH, height=130)
 fill_list(method_list)
 funcs = (draw_line_cda, draw_line_brez_float, draw_line_brez_int,
          draw_line_brez_smoth, draw_line_vu, canvas.create_line)
@@ -443,14 +438,16 @@ fxs = Entry(coords_frame, bg="white")
 fys = Entry(coords_frame, bg="white")
 fxf = Entry(coords_frame, bg="white")
 fyf = Entry(coords_frame, bg="white")
+
 fxs.place(x=30, y=25, width=35)
 fys.place(x=115, y=25, width=35)
 fxf.place(x=30, y=75, width=35)
 fyf.place(x=115, y=75, width=35)
-fxs.insert(0, str(canvW/2))
-fys.insert(0, str(canvH/2))
-fxf.insert(0, str(canvW/2 + line_r))
-fyf.insert(0, str(canvH/2 + line_r))
+
+fxs.insert(0, str(CANVAS_WIDTH / 2))
+fys.insert(0, str(CANVAS_HEIGHT / 2))
+fxf.insert(0, str(CANVAS_WIDTH / 2 + line_r))
+fyf.insert(0, str(CANVAS_HEIGHT/2 + line_r))
 
 lb_angle = Label(angle_frame, text="Угол поворота\n(в градусах):")
 lb_angle.place(x=2, y=2)
@@ -462,20 +459,28 @@ fangle.insert(0, "15")
 btn_viz = Button(angle_frame, text="Спектр", command=lambda: draw(1))
 btn_viz.place(x=120, y=30, width=120, height=25)
 
-lb_len = Label(comparison_frame, text="Длина отрезка\n(по умолчанию - 100):")
-lb_len.place(x=2, y=2)
-len_line = Entry(comparison_frame, bg="white")
-len_line.place(x=40, y=40, width=40)
-btn_time = Button(comparison_frame, text=u"Сравнение временных\nхарактеристик",
-                  command=lambda: analyze(0))
-btn_time.place(x=3, y=70, width=140, height=40)
-btn_smoth = Button(comparison_frame, text=u"Сравнение\nступенчатости", command=lambda: analyze(1))
-btn_smoth.place(x=150, y=70, width=140, height=40)
+lb_len = Label(comparison_frame, text="Длина отрезка\n(по умолчанию - 100)",
+               font='Calibri 15')
+lb_len.place(x=75, y=0)
 
-btn_clean = Button(menu_frame, text="Очистить экран", command=clean)
-btn_clean.place(x=25, y=0, width=95)
-btn_help = Button(menu_frame, text="Информация", command=show_info)
-btn_help.place(x=170, y=0, width=95)
+len_line = Entry(comparison_frame, font='Calibri 15', justify='center')
+len_line.place(x=0, y=60, width=400)
+
+btn_time = Button(comparison_frame, text="Временной\nанализ",
+                  font='Calibri 15', command=lambda: analyze(0))
+btn_time.place(x=0, y=90, width=190)
+
+btn_smoth = Button(comparison_frame, text="Сравнение\nступенчатости",
+                   font='Calibri 15', command=lambda: analyze(1))
+btn_smoth.place(x=220, y=90, width=190)
+
+btn_clean = Button(menu_frame, text="Очистить экран", font='Calibri 15',
+                   command=clean)
+btn_clean.place(x=0, y=0, width=190)
+
+btn_help = Button(menu_frame, text="Информация", font='Calibri 15',
+                  command=show_info)
+btn_help.place(x=220, y=0, width=190)
 
 
 # выбор цветов
