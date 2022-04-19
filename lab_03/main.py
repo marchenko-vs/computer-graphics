@@ -135,15 +135,21 @@ def draw(test_mode):
         if not xs and not ys:
             messagebox.showerror('Ошибка!',
                                  'Не заданы координаты начала отрезка.')
-        elif not xs or not ys:
+        elif not xs:
             messagebox.showerror('Ошибка!',
-                                 'Не задана одна из координат начала отрезка.')
+                                 'Не задана координата X начала отрезка.')
+        elif not ys:
+            messagebox.showerror('Ошибка!',
+                                 'Не задана координата Y начала отрезка.')
         elif not xf and not yf:
             messagebox.showerror('Ошибка!',
                                  'Не заданы координаты конца отрезка.')
-        elif not xf or not yf:
+        elif not xf:
             messagebox.showerror('Ошибка!',
-                                 'Не задана одна из координат конца отрезка.')
+                                 'Не задана координата X конца отрезка.')
+        elif not yf:
+            messagebox.showerror('Ошибка!',
+                                 'Не задана координата Y конца отрезка.')
         else:
             try:
                 xs, ys = round(float(xs)), round(float(ys))
@@ -165,7 +171,7 @@ def draw(test_mode):
                                 messagebox.showerror('Ошибка!',
                                                      'Введено нечисловое значение угла поворота.')
                             if angle:
-                                angle = round(angle)
+                                angle = round(float(angle))
                                 test(1, funcs[choice[0]], angle, [xs, ys],
                                      [xf, yf])
                             else:
@@ -183,10 +189,10 @@ def draw(test_mode):
                                      'Введено нечисловое значение одной из координат начала или конца отрезка.')
     elif not len(choice):
         messagebox.showerror('Ошибка!',
-                             'Не выбран метод построения отрезка.')
+                             'Не выбран алгоритм построения отрезка.')
     else:
         messagebox.showerror('Ошибка!',
-                             'Выбрано более одного метода простроения отрезка.')
+                             'Выбрано более одного алгоритма построения отрезка.')
 
 
 def analysis(mode):
@@ -205,11 +211,11 @@ def analysis(mode):
                     gradation_analysis(ind, length)
                 else:
                     messagebox.showwarning('Предупреждение!',
-                                           'Библиотечный метод не может '
+                                           'Алгоритм из стандартной библиотеки не может '
                                            'быть проанализирован на ступенчатость.')
             else:
                 messagebox.showwarning('Предупреждение!',
-                                       'Не выбран метод построения отрезка.')
+                                       'Не выбран алгоритм построения отрезка.')
     except ValueError:
         messagebox.showerror('Ошибка!',
                              'Введено нечисловое значение длины отрезка.')
@@ -217,6 +223,9 @@ def analysis(mode):
 
 def test(flag, method, angle, pb, pe):
     global COLOR_LINE
+
+    if angle < 0:
+        angle = abs(angle)
 
     total = 0
     steps = int(360 // angle)
