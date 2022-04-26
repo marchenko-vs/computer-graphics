@@ -7,4 +7,5 @@ pythonProject/
 Lib/
 Scripts/
 *.cfg
+share/
 

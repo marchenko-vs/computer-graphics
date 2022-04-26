@@ -1,9 +1,6 @@
-'''
-Параметрическое уравнение
-'''
-
 from math import cos, sin, pi
 from pixels import draw_pixels
+
 
 def parameter_circle(xc, yc, r, color, canvas, draw):
     step = 1 / r
@@ -14,9 +11,10 @@ def parameter_circle(xc, yc, r, color, canvas, draw):
         y = yc + round(r * sin(i))
 
         if draw:
-            draw_pixels(canvas, [x, y, color], xc, yc, circle = True)
-        
+            draw_pixels(canvas, [x, y, color], xc, yc, circle=True)
+
         i += step
+
 
 def parameter_ellipse(xc, yc, ra, rb, color, canvas, draw):
     if ra > rb:
@@ -30,6 +28,6 @@ def parameter_ellipse(xc, yc, ra, rb, color, canvas, draw):
         y = yc + round(rb * sin(i))
 
         if draw:
-            draw_pixels(canvas, [x, y, color], xc, yc, circle = False)
+            draw_pixels(canvas, [x, y, color], xc, yc, circle=False)
 
         i += step
