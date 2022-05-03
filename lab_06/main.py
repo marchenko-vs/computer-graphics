@@ -57,42 +57,45 @@ x_entry.place(width=125, height=30, x=30, y=230)
 y_entry = Entry(font=("Calibri", 16), justify='center')
 y_entry.place(width=125, height=30, x=195, y=230)
 
-Button(text="Построить точку", font=("Calibri", 16),
+Button(text="Построить\nточку", font=("Calibri", 16),
        highlightbackground="#b3b3cc", highlightthickness=30,
        command=lambda: draw_point(figures, img, x_entry, y_entry, points_listbox)). \
-    place(width=290, height=35, x=30, y=265)
+    place(width=125, height=50, x=30, y=265)
 
-points_listbox = Listbox(font=("Calibri", 14))
-points_listbox.place(width=290, height=125, x=30, y=305)
-
-Button(text="Замкнуть фигуру", font=("Calibri", 16),
+Button(text="Замкнуть\nфигуру", font=("Calibri", 16),
        highlightbackground="#b3b3cc", highlightthickness=30,
        command=lambda event="<Button-3>": click_right(figures, img)). \
-    place(width=290, height=35, x=30, y=435)
+    place(width=125, height=50, x=195, y=265)
+
+points_listbox = Listbox(font=("Calibri", 14))
+points_listbox.place(width=290, height=125, x=30, y=320)
 
 Label(text="Построение с помощью мыши",
-      font=("Calibri", 18, "bold")).place(width=345, height=30, x=0, y=475)
+      font=("Calibri", 18, "bold")).place(width=345, height=30, x=0, y=445)
 
 Label(text="Левая кнопка - добавить точку",
-      font=("Calibri", 16)).place(height=25, x=30, y=505)
+      font=("Calibri", 16)).place(width=345, height=25, y=475)
 
 Label(text="Правая кнопка - замкнуть фигуру",
-      font=("Calibri", 16)).place(height=25, x=20, y=530)
+      font=("Calibri", 16)).place(width=345, height=25, y=500)
+
+Label(text="Колесо - выбрать затравку",
+      font=("Calibri", 16)).place(width=345, height=25, y=525)
 
 Label(text="Время закраски:", font=("Calibri", 16)).place(width=150, height=30, x=20, y=560)
 
-time_entry = Entry(font=("Calibri", 16))
-time_entry.place(width=120, height=30, x=190, y=560)
+time_entry = Entry(font=("Calibri", 16), justify='center')
+time_entry.place(width=130, height=30, x=190, y=560)
 
 Button(text="Выполнить\nзакраску", font=("Calibri", 16),
        highlightbackground="#d1d1e0", highlightthickness=30,
        command=lambda: fill_figure(figures, img, canvas, color_var, mode_var, time_entry, seed_pixel)). \
-    place(width=145, height=50, x=25, y=595)
+    place(width=125, height=50, x=30, y=595)
 
 Button(text="Очистить\nэкран", font=("Calibri", 16),
        highlightbackground="#b3b3cc", highlightthickness=30,
        command=lambda: clear_canvas(img, figures, time_entry, points_listbox, seed_pixel)). \
-    place(width=145, height=50, x=180, y=595)
+    place(width=125, height=50, x=195, y=595)
 
 img = PhotoImage(width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
 canvas.create_image(CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2, image=img, state='normal')
