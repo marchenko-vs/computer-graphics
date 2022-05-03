@@ -5,7 +5,7 @@ import time
 from constants import *
 from draw import clear_canvas, add_circle, add_ellipse
 
-NUMBER_OF_RUNS = 15
+NUMBER_OF_RUNS = 20
 MAX_RADIUS = 10000
 STEP = 1000
 

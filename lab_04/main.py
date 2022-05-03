@@ -10,7 +10,7 @@ spectrum_widget_arr = list()
 
 
 def change_figure(rb_entry, figure):
-    if figure.get() == True:
+    if figure.get():
         rb_entry.configure(state=NORMAL)
         draw_fields_for_ellipse()
     else:
@@ -19,7 +19,7 @@ def change_figure(rb_entry, figure):
 
 
 def change_spectrum_entry(step_x_entry, step_y_entry, step_BooleanVar):
-    if step_BooleanVar.get() == True:
+    if step_BooleanVar.get():
         step_y_entry.configure(state=NORMAL)
         step_x_entry.configure(state=DISABLED)
     else:

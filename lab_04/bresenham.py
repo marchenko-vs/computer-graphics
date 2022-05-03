@@ -4,11 +4,10 @@ from pixels import draw_pixels
 def bresenham_circle(xc, yc, r, color, canvas, draw):
     x = 0
     y = r
+    delta = 2 * (1 - r)
 
     if draw:
         draw_pixels(canvas, [x + xc, y + yc, color], xc, yc, circle=True)
-
-    delta = 2 * (1 - r)
 
     while x < y:
         d = 2 * (delta + y) - 1
@@ -27,13 +26,12 @@ def bresenham_circle(xc, yc, r, color, canvas, draw):
 def bresenham_ellipse(xc, yc, ra, rb, color, canvas, draw):
     x = 0
     y = rb
-
-    if draw:
-        draw_pixels(canvas, [x + xc, y + yc, color], xc, yc, circle=False)
-
     sqr_ra = ra * ra
     sqr_rb = rb * rb
     delta = sqr_rb - sqr_ra * (rb + rb + 1)
+
+    if draw:
+        draw_pixels(canvas, [x + xc, y + yc, color], xc, yc, circle=False)
 
     while y >= 0:
         if delta <= 0:

@@ -52,7 +52,7 @@ def add_circle(canvas, color_fg, algorithm, xc, yc, r, draw=True):
     alg = algorithm.get()
 
     if alg == 0:
-        canonical_сircle(xc, yc, r, color, canvas, draw)
+        canonical_circle(xc, yc, r, color, canvas, draw)
     elif alg == 1:
         parameter_circle(xc, yc, r, color, canvas, draw)
     elif alg == 2:
