@@ -79,7 +79,7 @@ Label(text="Левая кнопка - добавить точку",
 Label(text="Правая кнопка - замкнуть фигуру",
       font=("Calibri", 16)).place(width=345, height=25, y=500)
 
-Label(text="Колесо - выбрать затравку",
+Label(text="Колесо - добавить затравку",
       font=("Calibri", 16)).place(width=345, height=25, y=525)
 
 Label(text="Время закраски:", font=("Calibri", 16)).place(width=150, height=30, x=20, y=560)

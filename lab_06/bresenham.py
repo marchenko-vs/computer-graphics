@@ -6,6 +6,7 @@ def sign(x):
     else:
         return 0
 
+
 def bresenham_int(beg_point, end_point, color):
     dx = end_point[0] - beg_point[0]
     dy = end_point[1] - beg_point[1]
@@ -50,7 +51,7 @@ def bresenham_int(beg_point, end_point, color):
             y += y_sign
         else:
             x += x_sign
-        
+
         e += two_dy
         i += 1
 

@@ -1,38 +1,40 @@
-from tkinter import messagebox, END
+from tkinter import messagebox
 from time import time
 
 from constants import *
 from bresenham import bresenham_int
 
 INDEX_POINT = 0
+BORDER_COLOR = '#ffc0cb' # ff8000
 
 
-def clear_canvas(img, figures, time_entry, points_listbox, seed_pixel):
+def clear_canvas(img, figures:list, time_entry, points_listbox, seed_pixel: list):
     global INDEX_POINT
 
     img.put("#ffffff", to=(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT))
 
     seed_pixel[0] = -1
     seed_pixel[1] = -1
+
     INDEX_POINT = 0
 
-    points_listbox.delete(0, END)
-    time_entry.delete(0, END)
+    points_listbox.delete(0, 'end')
+    time_entry.delete(0, 'end')
 
     figures.clear()
     figures.append([[]])
 
 
-def set_pixel(img, x, y, color):
+def draw_pixel(img, x, y, color):
     img.put(color, (x, y))
 
 
-def draw_line(img, points):
+def draw_line(img, points: list):
     for i in points:
-        set_pixel(img, i[0], i[1], i[2])
+        draw_pixel(img, i[0], i[1], i[2])
 
 
-def rgb(color):
+def rgb(color: str) -> tuple:
     return int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
 
 
@@ -55,65 +57,7 @@ def get_color(color_var):
     return color
 
 
-def click_left(event, figures, img, points_listbox):
-    global INDEX_POINT
-
-    x = event.x
-    y = event.y
-
-    color = "#ff8000"
-    set_pixel(img, x, y, color)
-
-    figures[-1][-1].append([x, y])
-
-    INDEX_POINT += 1
-    pstr = "%d. (%d, %d)" % (INDEX_POINT, x, y)
-    points_listbox.insert(END, pstr)
-
-    if len(figures[-1][-1]) == 2:
-        points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
-        draw_line(img, points)
-
-        figures[-1][-1].append(points)
-        figures[-1].append([figures[-1][-1][1]])
-
-
-def click_right(figures, img):
-    if len(figures[-1][-1]) == 0:
-        messagebox.showerror("Ошибка!", "Все фигуры замкнуты.")
-        return
-
-    if len(figures[-1]) <= 2:
-        messagebox.showerror("Ошибка!", "Фигура должна иметь более 1 ребра.")
-        return
-
-    point = figures[-1][0][0]
-    figures[-1][-1].append(point)
-
-    color = "#ff8000"
-
-    points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
-    draw_line(img, points)
-
-    figures[-1][-1].append(points)
-    figures.append([[]])
-
-
-def click_wheel(event, seed_pixel, img, color_var, points_listbox):
-    x = event.x
-    y = event.y
-
-    seed_pixel[0] = x
-    seed_pixel[1] = y
-
-    color = get_color(color_var)
-    set_pixel(img, x, y, color)
-
-    pstr = "seed pixel = (%d, %d)" % (x, y)
-    points_listbox.insert(END, pstr)
-
-
-def draw_point(figures, img, x_entry, y_entry, points_listbox):
+def draw_point(figures: list, img, x_entry, y_entry, points_listbox):
     global INDEX_POINT
 
     try:
@@ -122,16 +66,18 @@ def draw_point(figures, img, x_entry, y_entry, points_listbox):
     except:
         messagebox.showerror("Ошибка!",
                              "Координаты точки должны быть целыми числами.")
+
         return
 
-    color = "#ff8000"
-    set_pixel(img, x, y, color)
+    color = BORDER_COLOR
+    draw_pixel(img, x, y, color)
 
     figures[-1][-1].append([x, y])
 
     INDEX_POINT += 1
-    pstr = "%d. (%d, %d)" % (INDEX_POINT, x, y)
-    points_listbox.insert(END, pstr)
+    info_string = f"{INDEX_POINT}. ({x}, {y})"
+
+    points_listbox.insert('end', info_string)
 
     if len(figures[-1][-1]) == 2:
         points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
@@ -141,54 +87,34 @@ def draw_point(figures, img, x_entry, y_entry, points_listbox):
         figures[-1].append([figures[-1][-1][1]])
 
 
-def fill_figure(figures, img, canvas, color_var, mode_var, time_entry, seed_pixel):
-    if len(figures[-1][0]) != 0:
-        messagebox.showerror("Ошибка!", "Не все фигуры замкнуты.")
-        return
-
-    if seed_pixel == [-1, -1]:
-        messagebox.showerror("Ошибка!", "Отсутствует затравка.")
-        return
-
-    mark_color = get_color(color_var)
-    border_color = rgb("#ff8000")
-    delay = mode_var.get()
-
-    start_time = time()
-    method_with_seed(img, canvas, seed_pixel, mark_color, border_color, delay)
-    end_time = time()
-
-    time_str = str(round(end_time - start_time, 2)) + " сек"
-    time_entry.delete(0, END)
-    time_entry.insert(0, time_str)
-
-
-def method_with_seed(img, canvas, seed_pixel, mark_color, border_color_rgb, delay):
+def flood_fill_algorithm(img, canvas, seed_pixel, mark_color, border_color_rgb, delay):
     mark_color_rgb = rgb(mark_color)
 
     stack = [seed_pixel]
 
-    while (len(stack)):
-
+    while len(stack):
         seed_pixel = stack.pop()
 
         x = seed_pixel[0]
         y = seed_pixel[1]
 
-        set_pixel(img, x, y, mark_color)
+        draw_pixel(img, x, y, mark_color)
+
         x_tmp = x
         y_tmp = y
 
         x += 1
-        while img.get(x, y) != mark_color_rgb and img.get(x, y) != border_color_rgb and x < CANVAS_WIDTH:
-            set_pixel(img, x, y, mark_color)
+
+        while img.get(x, y) != border_color_rgb and img.get(x, y) != \
+                mark_color_rgb and x < CANVAS_WIDTH:
+            draw_pixel(img, x, y, mark_color)
             x += 1
 
         x_right = x - 1
-
         x = x_tmp - 1
+
         while img.get(x, y) != mark_color_rgb and img.get(x, y) != border_color_rgb and x > 0:
-            set_pixel(img, x, y, mark_color)
+            draw_pixel(img, x, y, mark_color)
             x -= 1
 
         x_left = x + 1
@@ -196,7 +122,7 @@ def method_with_seed(img, canvas, seed_pixel, mark_color, border_color_rgb, dela
         x = x_left
         y = y_tmp + 1
 
-        while x <= x_right:
+        while x_left <= x <= x_right:
             flag = False
 
             while img.get(x, y) != mark_color_rgb and img.get(x, y) != border_color_rgb and x <= x_right:
@@ -221,7 +147,7 @@ def method_with_seed(img, canvas, seed_pixel, mark_color, border_color_rgb, dela
         x = x_left
         y = y_tmp - 1
 
-        while x <= x_right:
+        while x_left <= x <= x_right:
             flag = False
 
             while img.get(x, y) != mark_color_rgb and img.get(x, y) != border_color_rgb and x <= x_right:
@@ -243,5 +169,92 @@ def method_with_seed(img, canvas, seed_pixel, mark_color, border_color_rgb, dela
             if x == x_beg:
                 x += 1
 
-        if (delay):
+        if delay:
             canvas.update()
+
+
+def fill_figure(figures, img, canvas, color_var, mode_var, time_entry, seed_pixel):
+    if len(figures[-1][0]) != 0:
+        messagebox.showerror("Ошибка!", "Не все фигуры замкнуты.")
+
+        return
+
+    if seed_pixel == [-1, -1]:
+        messagebox.showerror("Ошибка!", "Отсутствует затравка.")
+
+        return
+
+    mark_color = get_color(color_var)
+    border_color = rgb(BORDER_COLOR)
+
+    delay = mode_var.get()
+
+    start_time = time()
+    flood_fill_algorithm(img, canvas, seed_pixel, mark_color, border_color, delay)
+    end_time = time()
+
+    time_str = str(round(end_time - start_time, 2)) + " сек"
+
+    time_entry.delete(0, 'end')
+    time_entry.insert(0, time_str)
+
+
+def click_left(event, figures, img, points_listbox):
+    global INDEX_POINT
+
+    x = event.x
+    y = event.y
+
+    color = BORDER_COLOR
+    draw_pixel(img, x, y, color)
+
+    figures[-1][-1].append([x, y])
+
+    INDEX_POINT += 1
+    info_string = f"{INDEX_POINT}. ({x}, {y})"
+
+    points_listbox.insert('end', info_string)
+
+    if len(figures[-1][-1]) == 2:
+        points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
+        draw_line(img, points)
+
+        figures[-1][-1].append(points)
+        figures[-1].append([figures[-1][-1][1]])
+
+
+def click_right(figures, img):
+    if len(figures[-1][-1]) == 0:
+        messagebox.showerror("Ошибка!", "Все фигуры замкнуты.")
+
+        return
+
+    if len(figures[-1]) <= 2:
+        messagebox.showerror("Ошибка!", "Фигура должна иметь более 1 ребра.")
+
+        return
+
+    point = figures[-1][0][0]
+    figures[-1][-1].append(point)
+
+    color = BORDER_COLOR
+
+    points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
+    draw_line(img, points)
+
+    figures[-1][-1].append(points)
+    figures.append([[]])
+
+
+def click_wheel(event, seed_pixel, img, color_var, points_listbox):
+    x = event.x
+    y = event.y
+
+    seed_pixel[0] = x
+    seed_pixel[1] = y
+
+    color = get_color(color_var)
+    draw_pixel(img, x, y, color)
+
+    info_string = f"Затравка = ({x}, {y})"
+    points_listbox.insert('end', info_string)
