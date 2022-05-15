@@ -42,17 +42,17 @@ def get_color(color_var):
     col_var = color_var.get()
 
     if col_var == 0:
-        color = "#000000"
-    elif col_var == 1:
-        color = "#ff0000"
-    elif col_var == 2:
-        color = "#0000ff"
-    elif col_var == 3:
-        color = "#3ebd33"
-    elif col_var == 4:
-        color = "#ffd333"
-    else:
         color = "#bd08fc"
+    elif col_var == 1:
+        color = "#000000"
+    elif col_var == 2:
+        color = "#ff0000"
+    elif col_var == 3:
+        color = "#0000ff"
+    elif col_var == 4:
+        color = "#3ebd33"
+    else:
+        color = "#ffd333"
 
     return color
 
