@@ -1,6 +1,6 @@
 from constants import *
 from tkinter import *
-from draw import clear_canvas, click_left, click_wheel, click_right, draw_point, fill_figure
+from draw import clear_canvas, click_left, click_wheel, click_right, draw_point, fill_figure, draw_frame
 
 window = Tk()
 window.title("Лабораторная работа #6")
@@ -9,6 +9,8 @@ window.resizable(False, False)
 
 canvas = Canvas(window, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg="white")
 canvas.pack(side='right')
+
+Frame(width=350, height=WINDOW_HEIGHT).place(x=0, y=0)
 
 figures = [[[]]]
 
@@ -97,8 +99,8 @@ Button(text="Очистить\nэкран", font=("Calibri", 16),
        command=lambda: clear_canvas(img, figures, time_entry, points_listbox, seed_pixel)). \
     place(width=125, height=50, x=195, y=595)
 
-img = PhotoImage(width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
-canvas.create_image(CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2, image=img, state='normal')
+img = PhotoImage(width=CANVAS_WIDTH + 1, height=CANVAS_HEIGHT)
+canvas.create_image(CANVAS_WIDTH // 2 + 2, CANVAS_HEIGHT // 2, image=img, state='normal')
 
 seed_pixel = [-1, -1]
 
@@ -111,5 +113,7 @@ canvas.bind('<Button-3>',
 
 x_entry.insert(0, '100')
 y_entry.insert(0, '100')
+
+draw_frame(figures, img)
 
 window.mainloop()

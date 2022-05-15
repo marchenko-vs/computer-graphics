@@ -24,6 +24,8 @@ def clear_canvas(img, figures:list, time_entry, points_listbox, seed_pixel: list
     figures.clear()
     figures.append([[]])
 
+    draw_frame(figures, img)
+
 
 def draw_pixel(img, x, y, color):
     img.put(color, (x, y))
@@ -85,6 +87,28 @@ def draw_point(figures: list, img, x_entry, y_entry, points_listbox):
 
         figures[-1][-1].append(points)
         figures[-1].append([figures[-1][-1][1]])
+
+
+def draw_border(figures: list, img, x, y):    
+    color = BORDER_COLOR
+    draw_pixel(img, x, y, color)
+
+    figures[-1][-1].append([x, y])
+
+    if len(figures[-1][-1]) == 2:
+        points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
+        draw_line(img, points)
+
+        figures[-1][-1].append(points)
+        figures[-1].append([figures[-1][-1][1]])
+
+
+def draw_frame(figures: list, img):
+    draw_border(figures, img, 0, 0)
+    draw_border(figures, img, CANVAS_WIDTH, 0)
+    draw_border(figures, img, CANVAS_WIDTH, CANVAS_HEIGHT)
+    draw_border(figures, img, 0, CANVAS_HEIGHT)
+    click_right(figures, img)
 
 
 def flood_fill_algorithm(img, canvas, seed_pixel, mark_color, border_color_rgb, delay):
