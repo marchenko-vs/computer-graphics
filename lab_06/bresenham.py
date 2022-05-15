@@ -7,7 +7,11 @@ def sign(x):
         return 0
 
 
-def bresenham_int(beg_point, end_point, color):
+def draw_pixel(img, x, y, color):
+    img.put(color, (x, y))
+
+
+def bresenham(beg_point, end_point, color, img):
     dx = end_point[0] - beg_point[0]
     dy = end_point[1] - beg_point[1]
 
@@ -33,11 +37,11 @@ def bresenham_int(beg_point, end_point, color):
 
     x = beg_point[0]
     y = beg_point[1]
-    points = []
 
     i = 0
+
     while i <= dx:
-        points.append([x, y, color])
+        draw_pixel(img, x, y, color)
 
         if e >= 0:
             if exchange == 1:
@@ -54,5 +58,3 @@ def bresenham_int(beg_point, end_point, color):
 
         e += two_dy
         i += 1
-
-    return points

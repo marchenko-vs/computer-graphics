@@ -2,13 +2,13 @@ from tkinter import messagebox
 from time import time
 
 from constants import *
-from bresenham import bresenham_int
+from bresenham import draw_pixel, bresenham
 
 INDEX_POINT = 0
 BORDER_COLOR = '#ffc0cb' # ff8000
 
 
-def clear_canvas(img, figures:list, time_entry, points_listbox, seed_pixel: list):
+def clear_canvas(img, figures: list, time_entry, points_listbox, seed_pixel: list):
     global INDEX_POINT
 
     img.put("#ffffff", to=(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT))
@@ -27,15 +27,6 @@ def clear_canvas(img, figures:list, time_entry, points_listbox, seed_pixel: list
     draw_frame(figures, img)
 
 
-def draw_pixel(img, x, y, color):
-    img.put(color, (x, y))
-
-
-def draw_line(img, points: list):
-    for i in points:
-        draw_pixel(img, i[0], i[1], i[2])
-
-
 def rgb(color: str) -> tuple:
     return int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
 
@@ -44,7 +35,7 @@ def get_color(color_var):
     col_var = color_var.get()
 
     if col_var == 0:
-        color = "#000001"
+        color = "#bd08fc"
     elif col_var == 1:
         color = "#ff0000"
     elif col_var == 2:
@@ -54,7 +45,7 @@ def get_color(color_var):
     elif col_var == 4:
         color = "#ffd333"
     else:
-        color = "#bd08fc"
+        color = "#000001"
 
     return color
 
@@ -82,10 +73,8 @@ def draw_point(figures: list, img, x_entry, y_entry, points_listbox):
     points_listbox.insert('end', info_string)
 
     if len(figures[-1][-1]) == 2:
-        points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
-        draw_line(img, points)
+        bresenham(figures[-1][-1][0], figures[-1][-1][1], color, img)
 
-        figures[-1][-1].append(points)
         figures[-1].append([figures[-1][-1][1]])
 
 
@@ -96,10 +85,8 @@ def draw_border(figures: list, img, x, y):
     figures[-1][-1].append([x, y])
 
     if len(figures[-1][-1]) == 2:
-        points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
-        draw_line(img, points)
+        bresenham(figures[-1][-1][0], figures[-1][-1][1], color, img)
 
-        figures[-1][-1].append(points)
         figures[-1].append([figures[-1][-1][1]])
 
 
@@ -240,10 +227,7 @@ def click_left(event, figures, img, points_listbox):
     points_listbox.insert('end', info_string)
 
     if len(figures[-1][-1]) == 2:
-        points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
-        draw_line(img, points)
-
-        figures[-1][-1].append(points)
+        bresenham(figures[-1][-1][0], figures[-1][-1][1], color, img)
         figures[-1].append([figures[-1][-1][1]])
 
 
@@ -263,16 +247,34 @@ def click_right(figures, img):
 
     color = BORDER_COLOR
 
-    points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
-    draw_line(img, points)
+    bresenham(figures[-1][-1][0], figures[-1][-1][1], color, img)
 
-    figures[-1][-1].append(points)
     figures.append([[]])
 
 
 def click_wheel(event, seed_pixel, img, color_var, points_listbox):
     x = event.x
     y = event.y
+
+    seed_pixel[0] = x
+    seed_pixel[1] = y
+
+    color = get_color(color_var)
+    draw_pixel(img, x, y, color)
+
+    info_string = f"Затравка = ({x}, {y})"
+    points_listbox.insert('end', info_string)
+
+
+def add_seed(seed_pixel, img, color_var, points_listbox, x_entry, y_entry):
+    try:
+        x = int(x_entry.get())
+        y = int(y_entry.get())
+    except ValueError:
+        messagebox.showerror("Ошибка!",
+                             "Координаты затравки должны быть целыми числами.")
+
+        return
 
     seed_pixel[0] = x
     seed_pixel[1] = y
