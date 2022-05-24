@@ -17,7 +17,7 @@ def bresenham_int(img, beg_point, end_point, color):
 
     if dx == 0 and dy == 0:
         set_pixel(img, beg_point[0], beg_point[1], color)
-        
+
         return
 
     x_sign = sign(dx)
@@ -39,7 +39,7 @@ def bresenham_int(img, beg_point, end_point, color):
 
     x = beg_point[0]
     y = beg_point[1]
-    
+
     i = 0
 
     while i <= dx:

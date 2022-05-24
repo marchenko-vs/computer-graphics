@@ -5,11 +5,11 @@ from bresenham import *
 from tkinter import *
 from tkinter import messagebox
 
-index_point = 0
+INDEX_POINT = 0
 
 
-def clear_canvas(img, canvas, figures, p_min, p_max, time_entry, points_listbox):
-    global index_point
+def clear_canvas(img, figures, p_min, p_max, time_entry, points_listbox):
+    global INDEX_POINT
 
     img.put("#ffffff", to=(0, 0, const.CANVAS_WIDTH, const.CANVAS_HEIGHT))
 
@@ -18,7 +18,7 @@ def clear_canvas(img, canvas, figures, p_min, p_max, time_entry, points_listbox)
     p_max[0] = 0
     p_max[1] = 0
 
-    index_point = 0
+    INDEX_POINT = 0
     points_listbox.delete(0, END)
     time_entry.delete(0, END)
     figures.clear()
@@ -31,6 +31,7 @@ def rgb(color):
 
 def get_color(color_var):
     col_var = color_var.get()
+    color = ''
 
     match col_var:
         case 0:
@@ -64,12 +65,12 @@ def get_new_frame(x, y, p_min, p_max):
 
 
 def draw_point(figures, img, color_var, x_entry, y_entry, p_min, p_max, points_listbox):
-    global index_point
+    global INDEX_POINT
 
     try:
         x = int(x_entry.get())
         y = int(y_entry.get())
-    except:
+    except ValueError:
         messagebox.showerror("Ошибка!",
                              "Координаты точки должны быть целыми числами.")
         return
@@ -81,8 +82,8 @@ def draw_point(figures, img, color_var, x_entry, y_entry, p_min, p_max, points_l
 
     figures[-1][-1].append([x, y])
 
-    index_point += 1
-    info_string = f"{index_point}. ({x}, {y})"
+    INDEX_POINT += 1
+    info_string = f"{INDEX_POINT}. ({x}, {y})"
     points_listbox.insert(END, info_string)
 
     if len(figures[-1][-1]) == 2:
@@ -90,7 +91,7 @@ def draw_point(figures, img, color_var, x_entry, y_entry, p_min, p_max, points_l
         figures[-1].append([figures[-1][-1][1]])
 
 
-def mark_desired_pixels(img, figures, mark_color):
+def draw_contour(img, figures, mark_color):
     mark_color_rgb = rgb(mark_color)
 
     for figure in figures:
@@ -121,14 +122,14 @@ def mark_desired_pixels(img, figures, mark_color):
                 y += 1
 
 
-def method_with_flag(figures, img, canvas, mark_color, bg_color, figure_color, p_min, p_max, delay):
-    mark_desired_pixels(img, figures, mark_color)
+def edge_flag_algorithm(figures, img, canvas, mark_color, bg_color, figure_color, p_min, p_max, delay):
+    draw_contour(img, figures, mark_color)
     mark_color_rgb = rgb(mark_color)
 
     flag = False
 
     for y in range(p_max[1], p_min[1] - 1, -1):
-        for x in range(p_min[0], p_max[0] + 3):
+        for x in range(p_min[0], p_max[0] + 2):
             if img.get(x, y) == mark_color_rgb:
                 flag = not flag
 
@@ -148,13 +149,13 @@ def fill_figure(figures, img, canvas, color_var, p_min, p_max, mode_var, time_en
 
     mark_color = "#ff8000"
     bg_color = "#ffffff"
-    
+
     figure_color = get_color(color_var)
 
     delay = mode_var.get()
 
     start_time = time.time()
-    method_with_flag(figures, img, canvas, mark_color, bg_color, figure_color, p_min, p_max, delay)
+    edge_flag_algorithm(figures, img, canvas, mark_color, bg_color, figure_color, p_min, p_max, delay)
     end_time = time.time()
 
     time_str = str(round(end_time - start_time, 2)) + " сек"
@@ -163,7 +164,7 @@ def fill_figure(figures, img, canvas, color_var, p_min, p_max, mode_var, time_en
 
 
 def click_left(event, figures, img, color_var, p_min, p_max, points_listbox):
-    global index_point
+    global INDEX_POINT
 
     x = event.x
     y = event.y
@@ -175,8 +176,8 @@ def click_left(event, figures, img, color_var, p_min, p_max, points_listbox):
 
     figures[-1][-1].append([x, y])
 
-    index_point += 1
-    info_string = f"{index_point}. ({x}, {y})"
+    INDEX_POINT += 1
+    info_string = f"{INDEX_POINT}. ({x}, {y})"
     points_listbox.insert(END, info_string)
 
     if len(figures[-1][-1]) == 2:
@@ -184,7 +185,7 @@ def click_left(event, figures, img, color_var, p_min, p_max, points_listbox):
         figures[-1].append([figures[-1][-1][1]])
 
 
-def click_right(event, figures, img, color_var):
+def click_right(figures, img, color_var):
     if len(figures[-1][-1]) == 0:
         messagebox.showerror("Ошибка!", "Незамкнутых фигур нет.")
         return

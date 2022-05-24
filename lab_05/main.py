@@ -2,7 +2,6 @@ from constants import *
 from draw import *
 from tkinter import *
 
-
 window = Tk()
 window.title("Лабораторная работа #5")
 window.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+0+0")
@@ -90,7 +89,7 @@ Button(text="Выполнить закраску", font=("Calibri", 18),
 
 Button(text="Очистить экран", font=("Calibri", 18),
        highlightbackground="#b3b3cc", highlightthickness=30,
-       command=lambda: clear_canvas(img, canvas, figures, p_min, p_max,
+       command=lambda: clear_canvas(img, figures, p_min, p_max,
                                     time_entry, points_listbox)).place(width=370, height=50, x=40, y=925)
 
 img = PhotoImage(width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
@@ -99,7 +98,7 @@ canvas.create_image(CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2, image=img, state='nor
 canvas.bind('<Button-1>',
             lambda event: click_left(event, figures, img, color_var, p_min, p_max, points_listbox))
 canvas.bind('<Button-3>',
-            lambda event: click_right(event, figures, img, color_var))
+            lambda event: click_right(figures, img, color_var))
 
 x_entry.insert(0, '100')
 y_entry.insert(0, '100')
