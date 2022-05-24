@@ -25,10 +25,6 @@ def clear_canvas(img, canvas, figures, p_min, p_max, time_entry, points_listbox)
     figures.append([[]])
 
 
-def set_pixel(img, x, y, color):
-    img.put(color, (x, y))
-
-
 def draw_line(img, points):
     for i in points:
         set_pixel(img, i[0], i[1], i[2])
@@ -66,52 +62,6 @@ def max_min_point(x, y, p_min, p_max):
         p_max[1] = y
     if y < p_min[1]:
         p_min[1] = y
-
-
-def click_left(event, figures, img, color_var, p_min, p_max, points_listbox):
-    global index_point
-
-    x = event.x
-    y = event.y
-
-    max_min_point(x, y, p_min, p_max)
-
-    color = get_color(color_var)
-    set_pixel(img, x, y, color)
-
-    figures[-1][-1].append([x, y])
-
-    index_point += 1
-    pstr = "%d. (%d, %d)" % (index_point, x, y)
-    points_listbox.insert(END, pstr)
-
-    if len(figures[-1][-1]) == 2:
-        points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
-        draw_line(img, points)
-
-        figures[-1][-1].append(points)
-        figures[-1].append([figures[-1][-1][1]])
-
-
-def click_right(event, figures, img, color_var):
-    if len(figures[-1][-1]) == 0:
-        messagebox.showerror("Ошибка!", "Незамкнутых фигур нет.")
-        return
-
-    if len(figures[-1]) <= 2:
-        messagebox.showerror("Ошибка!", "Фигура должна иметь больше 1 ребра.")
-        return
-
-    point = figures[-1][0][0]
-    figures[-1][-1].append(point)
-
-    color = get_color(color_var)
-
-    points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
-    draw_line(img, points)
-
-    figures[-1][-1].append(points)
-    figures.append([[]])
 
 
 def draw_point(figures, img, color_var, x_entry, y_entry, p_min, p_max, points_listbox):
@@ -222,3 +172,49 @@ def method_with_flag(figures, img, canvas, mark_color, bg_color, figure_color, p
 
         if delay:
             canvas.update()
+
+
+def click_left(event, figures, img, color_var, p_min, p_max, points_listbox):
+    global index_point
+
+    x = event.x
+    y = event.y
+
+    max_min_point(x, y, p_min, p_max)
+
+    color = get_color(color_var)
+    set_pixel(img, x, y, color)
+
+    figures[-1][-1].append([x, y])
+
+    index_point += 1
+    pstr = f"{index_point}. ({x}, {y})"
+    points_listbox.insert(END, pstr)
+
+    if len(figures[-1][-1]) == 2:
+        points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
+        draw_line(img, points)
+
+        figures[-1][-1].append(points)
+        figures[-1].append([figures[-1][-1][1]])
+
+
+def click_right(event, figures, img, color_var):
+    if len(figures[-1][-1]) == 0:
+        messagebox.showerror("Ошибка!", "Незамкнутых фигур нет.")
+        return
+
+    if len(figures[-1]) <= 2:
+        messagebox.showerror("Ошибка!", "Фигура должна иметь больше 1 ребра.")
+        return
+
+    point = figures[-1][0][0]
+    figures[-1][-1].append(point)
+
+    color = get_color(color_var)
+
+    points = bresenham_int(figures[-1][-1][0], figures[-1][-1][1], color)
+    draw_line(img, points)
+
+    figures[-1][-1].append(points)
+    figures.append([[]])

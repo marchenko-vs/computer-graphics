@@ -7,6 +7,10 @@ def sign(x):
         return 0
 
 
+def set_pixel(img, x, y, color):
+    img.put(color, (x, y))
+
+
 def bresenham_int(beg_point, end_point, color):
     dx = end_point[0] - beg_point[0]
     dy = end_point[1] - beg_point[1]
