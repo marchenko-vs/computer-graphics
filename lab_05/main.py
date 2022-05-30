@@ -61,12 +61,16 @@ y_entry = Entry(font=("Calibri", 20), justify='center')
 y_entry.place(width=185, height=35, x=225, y=285)
 
 points_listbox = Listbox(font=("Calibri", 18))
-points_listbox.place(width=370, height=340, x=40, y=325)
+points_listbox.place(width=370, height=280, x=40, y=325)
 
 Button(text="Построить точку", font=("Calibri", 18),
        highlightbackground="#b3b3cc", highlightthickness=30,
        command=lambda: draw_point(figures, img, color_var, x_entry, y_entry,
-                                  p_min, p_max, points_listbox)).place(width=370, height=50, x=40, y=670)
+                                  p_min, p_max, points_listbox)).place(width=370, height=50, x=40, y=615)
+
+Button(text="Замкнуть фигуру", font=("Calibri", 18),
+       highlightbackground="#b3b3cc", highlightthickness=30,
+       command=lambda: click_right(figures, img, color_var)).place(width=370, height=50, x=40, y=670)
 
 Label(text="Построение с помощью мыши",
       font=("Calibri", 20, "bold")).place(width=445, height=30, x=0, y=740)

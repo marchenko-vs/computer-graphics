@@ -122,14 +122,15 @@ def draw_contour(img, figures, mark_color):
                 y += 1
 
 
-def edge_flag_algorithm(figures, img, canvas, mark_color, bg_color, figure_color, p_min, p_max, delay):
+def edge_flag_algorithm(figures, img, canvas, mark_color, 
+    bg_color, figure_color, p_min, p_max, delay):
     draw_contour(img, figures, mark_color)
     mark_color_rgb = rgb(mark_color)
 
     flag = False
 
     for y in range(p_max[1], p_min[1] - 1, -1):
-        for x in range(p_min[0], p_max[0] + 2):
+        for x in range(p_min[0], p_max[0] + 3):
             if img.get(x, y) == mark_color_rgb:
                 flag = not flag
 
