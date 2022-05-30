@@ -144,7 +144,30 @@ def draw_rectangle(rectangle, lines, canvas, color_var, x_top_left_entry, y_top_
     rectangle[3] = yr
 
 
-def add_vert_horiz_lines(rectangle, lines, canvas, color_var):
+def add_horizontal_lines(rectangle, lines, canvas, color_var):
+    if rectangle[0] == -1:
+        messagebox.showerror("Ошибка!", "Отсутствует отсекатель.")
+        return
+
+    color = get_color(color_var)
+
+    x1 = rectangle[0]
+    y1 = rectangle[1]
+    x2 = rectangle[2]
+    y2 = rectangle[3]
+
+    dx = x2 - x1
+
+    lines.append([[x1 + 0.1 * dx, y1], [x2 - 0.1 * dx, y1], color])
+    lines.append([[x1 + 0.1 * dx, y2], [x2 - 0.1 * dx, y2], color])
+
+    canvas.create_line(x1 + 0.1 * dx, y1, x2 - 0.1 * dx, y1, fill=color)
+    canvas.create_line(x1 + 0.1 * dx, y2, x2 - 0.1 * dx, y2, fill=color)
+
+    lines.append([])
+
+
+def add_vertical_lines(rectangle, lines, canvas, color_var):
     if rectangle[0] == -1:
         messagebox.showerror("Ошибка!", "Отсутствует отсекатель.")
         return
@@ -157,13 +180,12 @@ def add_vert_horiz_lines(rectangle, lines, canvas, color_var):
     y2 = rectangle[3]
 
     dy = y2 - y1
-    dx = x2 - x1
 
     lines.append([[x1, y1 + 0.1 * dy], [x1, y2 - 0.1 * dy], color])
-    lines.append([[x1 + 0.1 * dx, y1], [x2 - 0.1 * dx, y1], color])
+    lines.append([[x2, y1 + 0.1 * dy], [x2, y2 - 0.1 * dy], color])
 
     canvas.create_line(x1, y1 + 0.1 * dy, x1, y2 - 0.1 * dy, fill=color)
-    canvas.create_line(x1 + 0.1 * dx, y1, x2 - 0.1 * dx, y1, fill=color)
+    canvas.create_line(x2, y1 + 0.1 * dy, x2, y2 - 0.1 * dy, fill=color)
 
     lines.append([])
 
