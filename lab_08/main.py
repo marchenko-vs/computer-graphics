@@ -12,7 +12,7 @@ canvas = Canvas(window, width=const.CANVAS_WIDTH, height=const.CANVAS_HEIGHT, bg
 canvas.pack(side='right')
 
 lines = [[]]
-cutter_figure = []
+clipping_window = []
 
 Label(text="Цвет отсекателя", font=("Calibri", 20, "bold")).place(width=445, height=25, y=10)
 
@@ -100,8 +100,8 @@ ye_entry = Entry(font=("Calibri", 18), justify='center')
 ye_entry.place(width=70, height=30, x=340, y=460)
 
 Button(text="Построить отрезок", font=("Calibri", 18),
-       command=lambda: draw.add_line(lines, canvas, color_line_var,
-                                     xb_entry, yb_entry, xe_entry, ye_entry)).place(width=370, height=50, x=40, y=495)
+       command=lambda: draw.draw_line(lines, canvas, color_line_var,
+                                      xb_entry, yb_entry, xe_entry, ye_entry)).place(width=370, height=50, x=40, y=495)
 
 Label(text="Построение\nвершины отсекателя", font=("Calibri", 20, "bold")).place(width=445, y=550)
 
@@ -115,26 +115,26 @@ y_cut_entry.place(width=170, height=30, x=240, y=650)
 
 Button(text="Построить вершину отсекателя", font=("Calibri", 18),
        command=lambda:
-       draw.add_vertex_figure(lines, cutter_figure, canvas, color_cut_var, x_cut_entry, y_cut_entry)). \
+       draw.clipping_window_add_vertex(lines, clipping_window, canvas, color_cut_var, x_cut_entry, y_cut_entry)). \
     place(width=370, height=50, x=40, y=685)
 
 Button(text="Замкнуть отсекатель", font=("Calibri", 18),
-       command=lambda: draw.click_centre(cutter_figure, canvas, color_cut_var)). \
+       command=lambda: draw.click_wheel(clipping_window, canvas, color_cut_var)). \
     place(width=370, height=50, x=40, y=740)
 
 Button(text="Отсечь", font=("Calibri", 18),
-       command=lambda: draw.cut_off(cutter_figure, lines, canvas, color_cut_var, color_res_var)). \
+       command=lambda: draw.clip(clipping_window, lines, canvas, color_cut_var, color_res_var)). \
     place(width=370, height=50, x=40, y=850)
 
 Button(text="Очистить экран", font=("Calibri", 18),
-       command=lambda: draw.clear_canvas(canvas, lines, cutter_figure)).place(width=370, height=50, x=40, y=905)
+       command=lambda: draw.clear_canvas(canvas, lines, clipping_window)).place(width=370, height=50, x=40, y=905)
 
 canvas.bind('<Button-1>',
-            lambda event: draw.click_left(event, lines, canvas, color_line_var))
+            lambda event: draw.click_right(event, lines, clipping_window, canvas, color_cut_var))
 canvas.bind('<Button-2>',
-            lambda event: draw.click_centre(cutter_figure, canvas, color_cut_var))
+            lambda event: draw.click_wheel(clipping_window, canvas, color_cut_var))
 canvas.bind('<Button-3>',
-            lambda event: draw.click_right(event, lines, cutter_figure, canvas, color_cut_var))
+            lambda event: draw.click_left(event, lines, canvas, color_line_var))
 
 xb_entry.insert(0, '100')
 yb_entry.insert(0, '200')
