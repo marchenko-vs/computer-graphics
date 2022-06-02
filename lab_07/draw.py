@@ -1,7 +1,9 @@
-from tkinter import messagebox
-from sutherland_cohen import alg_sutherland_cohen
+import copy
+import simple_algorithm as sa
 
-is_set_rectangle = False
+from tkinter import messagebox
+
+IS_RECTANGLE_SET = False
 
 
 def clear_canvas(canvas, lines, rectangle):
@@ -51,21 +53,21 @@ def get_color(color_var):
 
 
 def click_left(event):
-    global is_set_rectangle
+    global IS_RECTANGLE_SET
 
-    is_set_rectangle = False
+    IS_RECTANGLE_SET = False
 
 
 def click_left_motion(event, rectangle, lines, canvas, color_var):
-    global is_set_rectangle
+    global IS_RECTANGLE_SET
 
     color = get_color(color_var)
 
-    if is_set_rectangle == False:
+    if IS_RECTANGLE_SET == False:
         rectangle[0] = event.x
         rectangle[1] = event.y
 
-        is_set_rectangle = True
+        IS_RECTANGLE_SET = True
     else:
         x = event.x
         y = event.y
@@ -117,6 +119,7 @@ def add_line(lines, canvas, color_var, xb_entry, yb_entry, xe_entry, ye_entry):
     lines[-1].append([xb, yb])
     lines[-1].append([xe, ye])
     lines[-1].append(color)
+
     lines.append([])
 
 
@@ -144,7 +147,7 @@ def draw_rectangle(rectangle, lines, canvas, color_var, x_top_left_entry, y_top_
     rectangle[3] = yr
 
 
-def add_horizontal_lines(rectangle, lines, canvas, color_var):
+def add_horizontal_and_vertical_lines(rectangle, lines, canvas, color_var):
     if rectangle[0] == -1:
         messagebox.showerror("Ошибка!", "Отсутствует отсекатель.")
         return
@@ -157,51 +160,61 @@ def add_horizontal_lines(rectangle, lines, canvas, color_var):
     y2 = rectangle[3]
 
     dx = x2 - x1
+    dy = y2 - y1
+
+    if lines[-1] == []:
+        lines.pop()
 
     lines.append([[x1 + 0.1 * dx, y1], [x2 - 0.1 * dx, y1], color])
     lines.append([[x1 + 0.1 * dx, y2], [x2 - 0.1 * dx, y2], color])
+    lines.append([[x1, y1 + 0.1 * dy], [x1, y2 - 0.1 * dy], color])
+    lines.append([[x2, y1 + 0.1 * dy], [x2, y2 - 0.1 * dy], color])
 
+    canvas.create_line(x1, y1 + 0.1 * dy, x1, y2 - 0.1 * dy, fill=color)
+    canvas.create_line(x2, y1 + 0.1 * dy, x2, y2 - 0.1 * dy, fill=color)
     canvas.create_line(x1 + 0.1 * dx, y1, x2 - 0.1 * dx, y1, fill=color)
     canvas.create_line(x1 + 0.1 * dx, y2, x2 - 0.1 * dx, y2, fill=color)
 
     lines.append([])
 
 
-def add_vertical_lines(rectangle, lines, canvas, color_var):
+def draw_visible_lines(result_list, color, canvas):
+    for line in result_list:
+        canvas.create_line(line[1][0], line[1][1], line[0][0], line[0][1], fill=color)
+
+
+def clip(rectangle, lines, canvas, color_var):
     if rectangle[0] == -1:
         messagebox.showerror("Ошибка!", "Отсутствует отсекатель.")
         return
 
     color = get_color(color_var)
 
-    x1 = rectangle[0]
-    y1 = rectangle[1]
-    x2 = rectangle[2]
-    y2 = rectangle[3]
+    result_list = []
 
-    dy = y2 - y1
+    if rectangle[0] < rectangle[2]:
+        left_side = rectangle[0]
+        right_side = rectangle[2]
+    else:
+        right_side = rectangle[0]
+        left_side = rectangle[2]
 
-    lines.append([[x1, y1 + 0.1 * dy], [x1, y2 - 0.1 * dy], color])
-    lines.append([[x2, y1 + 0.1 * dy], [x2, y2 - 0.1 * dy], color])
+    if rectangle[1] < rectangle[3]:
+        top_side = rectangle[1]
+        bottom_side = rectangle[3]
+    else:
+        bottom_side = rectangle[1]
+        top_side = rectangle[3]
 
-    canvas.create_line(x1, y1 + 0.1 * dy, x1, y2 - 0.1 * dy, fill=color)
-    canvas.create_line(x2, y1 + 0.1 * dy, x2, y2 - 0.1 * dy, fill=color)
+    tmp_list = copy.deepcopy(lines)
 
-    lines.append([])
+    for i in range(len(tmp_list) - 1):
+        tmp_list[i].pop()
 
+    for line in range(len(tmp_list) - 1):
+        result = sa.simple_algorithm(tmp_list, line, left_side, right_side, bottom_side, top_side)
 
-def cut_off(rectangle, lines, canvas, color_var):
-    if rectangle[0] == -1:
-        messagebox.showerror("Ошибка!", "Отсутствует отсекатель.")
+        if result:
+            result_list.append(result)
 
-    rect = [min(rectangle[0], rectangle[2]), max(rectangle[0], rectangle[2]),
-            min(rectangle[1], rectangle[3]), max(rectangle[1], rectangle[3])]
-
-    canvas.create_rectangle(rect[0] + 1, rect[2] + 1, rect[1] - 1, rect[3] - 1,
-                            fill="white", outline="white")
-
-    color = get_color(color_var)
-
-    for line in lines:
-        if (line):
-            alg_sutherland_cohen(rect, line, canvas, color)
+    draw_visible_lines(result_list, color, canvas)

@@ -131,16 +131,12 @@ Button(text="Построить отсекатель", font=("Calibri", 18),
                                            x_lower_right_entry, y_lower_right_entry)). \
     place(width=370, height=50, x=40, y=630)
 
-Button(text="Добавить горизонтальные отрезки", font=("Calibri", 18),
-       command=lambda: draw.add_horizontal_lines(rectangle, lines, canvas, color_line_var)). \
-    place(width=370, height=50, x=40, y=740)
-
-Button(text="Добавить вертикальные отрезки", font=("Calibri", 18),
-       command=lambda: draw.add_vertical_lines(rectangle, lines, canvas, color_line_var)). \
-    place(width=370, height=50, x=40, y=795)
+Button(text="Добавить горизонтальные\nи вертикальные отрезки", font=("Calibri", 18),
+       command=lambda: draw.add_horizontal_and_vertical_lines(rectangle, lines, canvas, color_line_var)). \
+    place(width=370, height=105, x=40, y=740)
 
 Button(text="Отсечь", font=("Calibri", 18),
-       command=lambda: draw.cut_off(rectangle, lines, canvas, color_res_var)). \
+       command=lambda: draw.clip(rectangle, lines, canvas, color_res_var)). \
     place(width=370, height=50, x=40, y=850)
 
 Button(text="Очистить экран", font=("Calibri", 18),
