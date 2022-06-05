@@ -1,207 +1,145 @@
+import draw
+
+from constants import *
 from tkinter import Tk, Radiobutton, Canvas, Label, Entry, Button, DISABLED, IntVar
-from draw import WINDOW_HEIGHT, WINDOW_WIDTH, CANVAS_WIDTH, CANVAS_HEIGHT, \
-                 clear_canvas, click_left, click_right, close_figure, add_vertex, cut_off
 
-def main():
-    window = Tk()
-    window.title("Лабораторная работа №9")
-    window.geometry("%dx%d" %(WINDOW_WIDTH, WINDOW_HEIGHT))
-    window.resizable(False, False)
-    window["bg"] = "#e0e0eb"
+main_window = Tk()
+main_window.title("Лабораторная работа #9")
+main_window.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+0+0")
+main_window.resizable(False, False)
 
-    canvas = Canvas(window, width = CANVAS_WIDTH, height = CANVAS_HEIGHT, bg = "white")
-    canvas.place(x = 0, y = 0)
+canvas = Canvas(main_window, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg="white")
+canvas.pack(side='right')
 
-    figure = []
-    cutter = []
+figure = list()
+clipper = list()
 
-    Label(text = "ЦВЕТ ОТСЕКАТЕЛЯ", font = ("Arial", 16, "bold"), bg = "#7575a3",
-        fg = "white").place(width = 305, height = 25, x = CANVAS_WIDTH + 5, y = 0)
+Label(text="Цвет отсекателя", font=("Calibri", 20, "bold")).place(width=445)
 
-    color_cut_var = IntVar()
-    color_cut_var.set(2)
+color_clipper_var = IntVar()
+color_clipper_var.set(0)
 
-    Radiobutton(text = "Чёрный", variable = color_cut_var, value = 0,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 20, y = 30)
+Radiobutton(text="Черный", variable=color_clipper_var, value=0,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=40, y=40)
 
-    Radiobutton(text = "Красный", variable = color_cut_var, value = 1,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 112010, height = 20, x = CANVAS_WIDTH + 20, y = 50)
+Radiobutton(text="Красный", variable=color_clipper_var, value=1,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=40, y=70)
 
-    Radiobutton(text = "Синий", variable = color_cut_var, value = 2,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 20, y = 70)
+Radiobutton(text="Синий", variable=color_clipper_var, value=2,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=40, y=100)
 
-    Radiobutton(text = "Зелёный", variable = color_cut_var, value = 3,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 180, y = 30)
+Radiobutton(text="Зеленый", variable=color_clipper_var, value=3,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=260, y=40)
 
-    Radiobutton(text = "Жёлтый", variable = color_cut_var, value = 4,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 180, y = 50)
+Radiobutton(text="Желтый", variable=color_clipper_var, value=4,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=260, y=70)
 
-    Radiobutton(text = "Фиолетовый", variable = color_cut_var, value = 5,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 180, y = 70)
+Radiobutton(text="Фиолетовый", variable=color_clipper_var, value=5,
+            font=("Calibri", 18), anchor="w").place(width=160, height=25, x=260, y=100)
 
+Label(text="Цвет фигуры", font=("Calibri", 20, "bold")).place(width=445, y=130)
 
+color_figure_var = IntVar()
+color_figure_var.set(3)
 
-    Label(text = "ЦВЕТ ФИГУРЫ", font = ("Arial", 16, "bold"), bg = "#7575a3",
-        fg = "white").place(width = 305, height = 25, x = CANVAS_WIDTH + 5, y = 95)
+Radiobutton(text="Черный", variable=color_figure_var, value=0,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=40, y=170)
 
-    color_fig_var = IntVar()
-    color_fig_var.set(3)
+Radiobutton(text="Красный", variable=color_figure_var, value=1,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=40, y=200)
 
-    Radiobutton(text = "Чёрный", variable = color_fig_var, value = 0,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 20, y = 125)
+Radiobutton(text="Синий", variable=color_figure_var, value=2,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=40, y=230)
 
-    Radiobutton(text = "Красный", variable = color_fig_var, value = 1,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 112010, height = 20, x = CANVAS_WIDTH + 20, y = 145)
+Radiobutton(text="Зеленый", variable=color_figure_var, value=3,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=260, y=170)
 
-    Radiobutton(text = "Синий", variable = color_fig_var, value = 2,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 20, y = 165)
+Radiobutton(text="Желтый", variable=color_figure_var, value=4,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=260, y=200)
 
-    Radiobutton(text = "Зелёный", variable = color_fig_var, value = 3,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 180, y = 125)
+Radiobutton(text="Фиолетовый", variable=color_figure_var, value=5,
+            font=("Calibri", 18), anchor="w").place(width=160, height=25, x=260, y=230)
 
-    Radiobutton(text = "Жёлтый", variable = color_fig_var, value = 4,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 180, y = 145)
+Label(text="Цвет результата", font=("Calibri", 20, "bold")).place(width=445, y=260)
 
-    Radiobutton(text = "Фиолетовый", variable = color_fig_var, value = 5,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 180, y = 165)
+color_result_var = IntVar()
+color_result_var.set(1)
 
+Radiobutton(text="Черный", variable=color_result_var, value=0,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=40, y=300)
 
+Radiobutton(text="Красный", variable=color_result_var, value=1,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=40, y=330)
 
-    Label(text = "ЦВЕТ РЕЗУЛЬТАТА", font = ("Arial", 16, "bold"), bg = "#7575a3",
-        fg = "white").place(width = 305, height = 25, x = CANVAS_WIDTH + 5, y = 190)
+Radiobutton(text="Синий", variable=color_result_var, value=2,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=40, y=360)
 
-    color_res_var = IntVar()
-    color_res_var.set(1)
+Radiobutton(text="Зеленый", variable=color_result_var, value=3,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=260, y=300)
 
-    Radiobutton(text = "Чёрный", variable = color_res_var, value = 0,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 20, y = 220)
+Radiobutton(text="Желтый", variable=color_result_var, value=4,
+            font=("Calibri", 18), anchor="w").place(width=120, height=25, x=260, y=330)
 
-    Radiobutton(text = "Красный", variable = color_res_var, value = 1,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 112010, height = 20, x = CANVAS_WIDTH + 20, y = 240)
+Radiobutton(text="Фиолетовый", variable=color_result_var, value=5,
+            font=("Calibri", 18), anchor="w").place(width=160, height=25, x=260, y=360)
 
-    Radiobutton(text = "Синий", variable = color_res_var, value = 2,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 20, y = 260)
+Label(text="Построение вершин фигуры", font=("Calibri", 20, "bold")).place(width=445, y=390)
 
-    Radiobutton(text = "Зелёный", variable = color_res_var, value = 3,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 180, y = 220)
+Label(text="X", font=("Calibri", 18)).place(x=115, y=425)
+Label(text="Y", font=("Calibri", 18)).place(x=315, y=425)
 
-    Radiobutton(text = "Жёлтый", variable = color_res_var, value = 4,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 180, y = 240)
+entry_figure_x = Entry(font=("Calibri", 18), justify='center')
+entry_figure_x.place(width=170, height=30, x=40, y=460)
 
-    Radiobutton(text = "Фиолетовый", variable = color_res_var, value = 5,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 180, y = 260)
+entry_figure_y = Entry(font=("Calibri", 18), justify='center')
+entry_figure_y.place(width=170, height=30, x=240, y=460)
 
+Button(text="Построить вершину", font=("Calibri", 18),
+       command=lambda:
+       draw.add_vertex(clipper, figure, canvas, color_figure_var, color_clipper_var, entry_figure_x, entry_figure_y)). \
+    place(width=370, height=50, x=40, y=495)
 
+Button(text="Замкнуть фигуру", font=("Calibri", 18),
+       command=lambda: draw.close_figure(figure, canvas, color_figure_var, info_name="Фигура должна")). \
+    place(width=370, height=50, x=40, y=550)
 
-    Label(text = "ПОСТР. ВЕРШИНЫ ФИГУРЫ", font = ("Arial", 16, "bold"), bg = "#7575a3",
-        fg = "white").place(width = 305, height = 25, x = CANVAS_WIDTH + 5, y = 285)
+Label(text="Построение вершин отсекателя", font=("Calibri", 20, "bold")).place(width=445, y=610)
 
-    Label(text = "X\t\tY", font = ("Arial", 16), bg = "#e0e0eb",
-        fg = "#29293d").place(width = 268, height = 20, x = CANVAS_WIDTH + 25, y = 320)
+Label(text="X", font=("Calibri", 18)).place(x=115, y=645)
+Label(text="Y", font=("Calibri", 18)).place(x=315, y=645)
 
-    x_fig_entry = Entry(font = ("Arial", 16))
-    x_fig_entry.place(width = 134, height = 30, x = CANVAS_WIDTH + 25, y = 345)
+entry_clipper_x = Entry(font=("Calibri", 18), justify='center')
+entry_clipper_x.place(width=170, height=30, x=40, y=680)
 
-    y_fig_entry = Entry(font = ("Arial", 16))
-    y_fig_entry.place(width = 134, height = 30, x = CANVAS_WIDTH + 159, y = 345)
+entry_clipper_y = Entry(font=("Calibri", 18), justify='center')
+entry_clipper_y.place(width=170, height=30, x=240, y=680)
 
-    Button(highlightbackground = "#7575a3", highlightthickness = 30, fg = "#e0e0eb", state = DISABLED).\
-        place(width = 268, height = 30,  x = CANVAS_WIDTH + 25, y = 385)
+Button(text="Построить вершину", font=("Calibri", 18),
+       command=lambda:
+       draw.add_vertex(figure, clipper, canvas, color_clipper_var, color_figure_var, entry_clipper_x, entry_clipper_y)). \
+    place(width=370, height=50, x=40, y=715)
 
-    Button(text = "Постр. вершину фигуры", font = ("Arial", 16), 
-        highlightbackground = "#b3b3cc", highlightthickness = 30, fg = "#33334d",
-        command = lambda: 
-        add_vertex(cutter, figure, canvas, color_fig_var, color_cut_var, x_fig_entry, y_fig_entry)).\
-        place(width = 264, height = 26,  x = CANVAS_WIDTH + 27, y = 387)
-    
-    Button(highlightbackground = "#7575a3", highlightthickness = 30, fg = "#e0e0eb", state = DISABLED).\
-        place(width = 268, height = 30,  x = CANVAS_WIDTH + 25, y = 420)
+Button(text="Замкнуть отсекатель", font=("Calibri", 18),
+       command=lambda: draw.close_figure(clipper, canvas, color_clipper_var, info_name="Отсекатель должен")). \
+    place(width=370, height=50, x=40, y=770)
 
-    Button(text = "Замкнуть фигуру", font = ("Arial", 16), 
-        highlightbackground = "#d1d1e0", highlightthickness = 30, fg = "#33334d",
-        command = lambda: close_figure(figure, canvas, color_fig_var, fig_str = "Фигура должна")).\
-        place(width = 264, height = 26,  x = CANVAS_WIDTH + 27, y = 422)
+Button(text="Отсечь", font=("Calibri", 18),
+       command=lambda: draw.clip(clipper, figure, canvas, color_result_var)). \
+    place(width=370, height=50, x=40, y=880)
 
+Button(text="Очистить экран", font=("Calibri", 18),
+       command=lambda: draw.clear_canvas(canvas, figure, clipper)). \
+    place(width=370, height=50, x=40, y=935)
 
+canvas.bind('<Button-1>',
+            lambda event: draw.click_left(event, figure, clipper, canvas, color_clipper_var, color_figure_var))
+canvas.bind('<Button-3>',
+            lambda event: draw.click_right(event, clipper, figure, canvas, color_figure_var, color_clipper_var))
 
-    Label(text = "ПОСТР. ВЕРШИНЫ ОТСЕКАТЕЛЯ", font = ("Arial", 16, "bold"), bg = "#7575a3",
-        fg = "white").place(width = 305, height = 25, x = CANVAS_WIDTH + 5, y = 460)
+entry_figure_x.insert(0, '100')
+entry_figure_y.insert(0, '200')
 
-    Label(text = "X\t\tY", font = ("Arial", 16), bg = "#e0e0eb",
-        fg = "#29293d").place(width = 268, height = 20, x = CANVAS_WIDTH + 25, y = 495)
+entry_clipper_x.insert(0, '200')
+entry_clipper_y.insert(0, '100')
 
-    x_cut_entry = Entry(font = ("Arial", 16))
-    x_cut_entry.place(width = 134, height = 30, x = CANVAS_WIDTH + 25, y = 520)
-
-    y_cut_entry = Entry(font = ("Arial", 16))
-    y_cut_entry.place(width = 134, height = 30, x = CANVAS_WIDTH + 159, y = 520)
-
-    Button(highlightbackground = "#7575a3", highlightthickness = 30, fg = "#e0e0eb", state = DISABLED).\
-        place(width = 268, height = 30,  x = CANVAS_WIDTH + 25, y = 560)
-
-    Button(text = "Постр. вершину отсекателя", font = ("Arial", 16), 
-        highlightbackground = "#b3b3cc", highlightthickness = 30, fg = "#33334d",
-        command = lambda: 
-        add_vertex(figure, cutter, canvas, color_cut_var, color_fig_var, x_cut_entry, y_cut_entry)).\
-        place(width = 264, height = 26,  x = CANVAS_WIDTH + 27, y = 562)
-    
-    Button(highlightbackground = "#7575a3", highlightthickness = 30, fg = "#e0e0eb", state = DISABLED).\
-        place(width = 268, height = 30,  x = CANVAS_WIDTH + 25, y = 595)
-
-    Button(text = "Замкнуть отсекатель", font = ("Arial", 16), 
-        highlightbackground = "#d1d1e0", highlightthickness = 30, fg = "#33334d",
-        command = lambda: close_figure(cutter, canvas, color_cut_var, fig_str = "Отсекатель должен")).\
-        place(width = 264, height = 26,  x = CANVAS_WIDTH + 27, y = 597)
-
-
-
-    Button(highlightbackground = "#7575a3", highlightthickness = 30, fg = "#e0e0eb", state = DISABLED).\
-        place(width = 268, height = 40,  x = CANVAS_WIDTH + 25, y = 635)
-
-    Button(text = "Отсечь", font = ("Arial", 16), 
-        highlightbackground = "#d1d1e0", highlightthickness = 30, fg = "#33334d",
-        command = lambda: cut_off(cutter, figure, canvas, color_res_var)).\
-        place(width = 264, height = 36,  x = CANVAS_WIDTH + 27, y = 637)
-
-    Button(highlightbackground = "#7575a3", highlightthickness = 30, fg = "#e0e0eb", state = DISABLED).\
-        place(width = 268, height = 40,  x = CANVAS_WIDTH + 25, y = 680)
-
-    Button(text = "Очистить экран", font = ("Arial", 16), 
-        highlightbackground = "#b3b3cc", highlightthickness = 30, fg = "#33334d",
-        command = lambda: clear_canvas(canvas, figure, cutter)).\
-        place(width = 264, height = 36,  x = CANVAS_WIDTH + 27, y = 682)
-
-
-    canvas.bind('<1>', 
-        lambda event: click_left(event, cutter, figure, canvas, color_fig_var, color_cut_var))
-    canvas.bind('<2>', 
-        lambda event: click_right(event, figure, cutter, canvas, color_cut_var, color_fig_var))
-
-    x_fig_entry.insert(0, 100)
-    y_fig_entry.insert(0, 200)
-
-    x_cut_entry.insert(0, 200)
-    y_cut_entry.insert(0, 100)
-    
-    window.mainloop()
-
-if __name__ == "__main__":
-    main()
+main_window.mainloop()
