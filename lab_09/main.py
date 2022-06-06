@@ -100,7 +100,7 @@ Button(text="Построить вершину", font=("Calibri", 18),
     place(width=370, height=50, x=40, y=495)
 
 Button(text="Замкнуть фигуру", font=("Calibri", 18),
-       command=lambda: draw.close_figure(figure, canvas, color_figure_var, info_name="Фигура должна")). \
+       command=lambda: draw.close_figure(figure, canvas, color_figure_var, object_name="Фигура должна")). \
     place(width=370, height=50, x=40, y=550)
 
 Label(text="Построение вершин отсекателя", font=("Calibri", 20, "bold")).place(width=445, y=610)
@@ -120,7 +120,7 @@ Button(text="Построить вершину", font=("Calibri", 18),
     place(width=370, height=50, x=40, y=715)
 
 Button(text="Замкнуть отсекатель", font=("Calibri", 18),
-       command=lambda: draw.close_figure(clipper, canvas, color_clipper_var, info_name="Отсекатель должен")). \
+       command=lambda: draw.close_figure(clipper, canvas, color_clipper_var, object_name="Отсекатель должен")). \
     place(width=370, height=50, x=40, y=770)
 
 Button(text="Отсечь", font=("Calibri", 18),

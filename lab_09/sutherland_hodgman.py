@@ -1,63 +1,63 @@
-def get_vector(dot1, dot2):
-    return [dot2[0] - dot1[0], dot2[1] - dot1[1]]
+def vector_product(vector_0, vector_1):
+    return vector_0[0] * vector_1[1] - vector_0[1] * vector_1[0]
 
 
-def vector_mul(vec1, vec2):
-    return vec1[0] * vec2[1] - vec1[1] * vec2[0]
+def scalar_product(vector_0, vector_1):
+    return vector_0[0] * vector_1[0] + vector_0[1] * vector_1[1]
 
 
-def scalar_mul(vec1, vec2):
-    return vec1[0] * vec2[0] + vec1[1] * vec2[1]
+def get_vector(dot_0, dot_1):
+    return [dot_1[0] - dot_0[0], dot_1[1] - dot_0[1]]
 
 
-def get_normal(dot1, dot2, dot3):
-    vector = get_vector(dot1, dot2)
+def get_lines_parametric_intersection(line_0, line_1, normal):
+    d = get_vector(line_0[0], line_0[1])
+    w = get_vector(line_1[0], line_0[0])
+
+    d_scalar = scalar_product(d, normal)
+    w_scalar = scalar_product(w, normal)
+
+    t = -w_scalar / d_scalar
+
+    return [line_0[0][0] + d[0] * t, line_0[0][1] + d[1] * t]
+
+
+def is_visible(dot, f_dot, s_dot):
+    vector_0 = get_vector(f_dot, s_dot)
+    vector_1 = get_vector(f_dot, dot)
+
+    if vector_product(vector_0, vector_1) <= 0:
+        return True
+    else:
+        return False
+
+
+def get_normal(dot_0, dot_1, dot_2):
+    vector = get_vector(dot_0, dot_1)
 
     if vector[1]:
         normal = [1, - vector[0] / vector[1]]
     else:
         normal = [0, 1]
 
-    if scalar_mul(get_vector(dot2, dot3), normal) < 0:
-        normal[0] = - normal[0]
-        normal[1] = - normal[1]
+    if scalar_product(get_vector(dot_1, dot_2), normal) < 0:
+        normal[0] = -normal[0]
+        normal[1] = -normal[1]
 
     return normal
 
 
-def is_visible(dot, f_dot, s_dot):
-    vec1 = get_vector(f_dot, s_dot)
-    vec2 = get_vector(f_dot, dot)
-
-    if vector_mul(vec1, vec2) <= 0:
-        return True
-    else:
-        return False
-
-
-def get_lines_parametric_intersection(line1, line2, normal):
-    d = get_vector(line1[0], line1[1])
-    w = get_vector(line2[0], line1[0])
-
-    d_scalar = scalar_mul(d, normal)
-    w_scalar = scalar_mul(w, normal)
-
-    t = -w_scalar / d_scalar
-
-    return [line1[0][0] + d[0] * t, line1[0][1] + d[1] * t]
-
-
-def sutherland_hodgman_algorithm(clipper_line, position, figure):
+def sutherland_hodgman_algorithm(clipper_line, trial_point, figure):
     current_result = []
 
-    dot1 = clipper_line[0]
-    dot2 = clipper_line[1]
+    dot_0 = clipper_line[0]
+    dot_1 = clipper_line[1]
 
-    normal = get_normal(dot1, dot2, position)
-    prev_vision = is_visible(figure[-2], dot1, dot2)
+    normal = get_normal(dot_0, dot_1, trial_point)
+    prev_vision = is_visible(figure[-2], dot_0, dot_1)
 
     for i in range(-1, len(figure)):
-        cur_vision = is_visible(figure[i], dot1, dot2)
+        cur_vision = is_visible(figure[i], dot_0, dot_1)
 
         if prev_vision:
             if cur_vision:
