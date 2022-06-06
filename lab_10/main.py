@@ -1,220 +1,151 @@
-from tkinter import Tk, Radiobutton, Canvas, Label, Entry, Button, DISABLED, IntVar
-from draw import WINDOW_HEIGHT, WINDOW_WIDTH, CANVAS_WIDTH, CANVAS_HEIGHT, \
-                 clear_canvas, build_graph, spin_x, spin_y, spin_z, scale_graph
+import constants as const
+import draw
+import tkinter as tk
 
-def main():
-    window = Tk()
-    window.title("Лабораторная работа №10")
-    window.geometry("%dx%d" %(WINDOW_WIDTH, WINDOW_HEIGHT))
-    window.resizable(False, False)
-    window["bg"] = "#e0e0eb"
+main_window = tk.Tk()
+main_window.title("Лабораторная работа #10")
+main_window.geometry(f"{const.WINDOW_WIDTH}x{const.WINDOW_HEIGHT}+0+0")
+main_window.resizable(False, False)
 
-    canvas = Canvas(window, width = CANVAS_WIDTH, height = CANVAS_HEIGHT, bg = "white")
-    canvas.place(x = 0, y = 0)
+main_canvas = tk.Canvas(main_window, width=const.CANVAS_WIDTH, height=const.CANVAS_HEIGHT, bg="white")
+main_canvas.pack(side='right')
 
+tk.Label(text="Цвет", font=("Calibri", 20, "bold")).place(width=445, y=10)
 
+color_var = tk.IntVar()
+color_var.set(1)
 
-    Label(text = "ЦВЕТ", font = ("Arial", 16, "bold"), bg = "#7575a3",
-        fg = "white").place(width = 305, height = 25, x = CANVAS_WIDTH + 5, y = 0)
+tk.Radiobutton(text="Черный", variable=color_var, value=0,
+               font=("Calibri", 18), anchor="w").place(width=120, height=25, x=40, y=60)
 
-    color_var = IntVar()
-    color_var.set(2)
+tk.Radiobutton(text="Красный", variable=color_var, value=1,
+               font=("Calibri", 18), anchor="w").place(width=120, height=25, x=40, y=90)
 
-    Radiobutton(text = "Чёрный", variable = color_var, value = 0,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 20, y = 30)
+tk.Radiobutton(text="Синий", variable=color_var, value=2,
+               font=("Calibri", 18), anchor="w").place(width=120, height=25, x=40, y=120)
 
-    Radiobutton(text = "Красный", variable = color_var, value = 1,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 112010, height = 20, x = CANVAS_WIDTH + 20, y = 50)
+tk.Radiobutton(text="Зеленый", variable=color_var, value=3,
+               font=("Calibri", 18), anchor="w").place(width=120, height=25, x=260, y=60)
 
-    Radiobutton(text = "Синий", variable = color_var, value = 2,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 20, y = 70)
+tk.Radiobutton(text="Желтый", variable=color_var, value=4,
+               font=("Calibri", 18), anchor="w").place(width=120, height=25, x=260, y=90)
 
-    Radiobutton(text = "Зелёный", variable = color_var, value = 3,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 180, y = 30)
+tk.Radiobutton(text="Фиолетовый", variable=color_var, value=5,
+               font=("Calibri", 18), anchor="w").place(width=160, height=25, x=260, y=120)
 
-    Radiobutton(text = "Жёлтый", variable = color_var, value = 4,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 180, y = 50)
+tk.Label(text="Функция", font=("Calibri", 20, "bold")).place(width=445, y=150)
 
-    Radiobutton(text = "Фиолетовый", variable = color_var, value = 5,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 120, height = 20, x = CANVAS_WIDTH + 180, y = 70)
+function_var = tk.IntVar()
+function_var.set(0)
 
+tk.Radiobutton(text="sin(x) * cos(z)", variable=function_var, value=0,
+               font=("Calibri", 18), anchor="w").place(height=25, x=130, y=190)
 
+tk.Radiobutton(text="sin(cos(x)) * sin(z)", variable=function_var, value=1,
+               font=("Calibri", 18), anchor="w").place(height=25, x=130, y=220)
 
-    Label(text = "ФУНКЦИЯ", font = ("Arial", 16, "bold"), bg = "#7575a3",
-        fg = "white").place(width = 305, height = 25, x = CANVAS_WIDTH + 5, y = 95)
+tk.Radiobutton(text="cos(x) * z / 4", variable=function_var, value=2,
+               font=("Calibri", 18), anchor="w").place(height=25, x=130, y=250)
 
-    func_var = IntVar()
-    func_var.set(0)
+tk.Radiobutton(text="cos(x) * cos(sin(z))", variable=function_var, value=3,
+               font=("Calibri", 18), anchor="w").place(height=25, x=130, y=280)
 
-    Radiobutton(text = "sin(x) * cos(z)", variable = func_var, value = 0,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 200, height = 25, x = CANVAS_WIDTH + 80, y = 125)
+tk.Label(text="Пределы", font=("Calibri", 20, "bold")).place(width=445, height=25, y=320)
 
-    Radiobutton(text = "sin(cos(x)) * sin(z)", variable = func_var, value = 1,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 200, height = 25, x = CANVAS_WIDTH + 80, y = 150)
+tk.Label(text="от\tдо\tшаг", font=("Calibri", 18)).place(width=445, y=350)
 
-    Radiobutton(text = "cos(x) * z / 4", variable = func_var, value = 2,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 200, height = 25, x = CANVAS_WIDTH + 80, y = 175)
+tk.Label(text="Ox", font=("Calibri", 18)).place(height=25, x=20, y=390)
+tk.Label(text="Oz", font=("Calibri", 18)).place(height=25, x=20, y=440)
 
-    Radiobutton(text = "cos(x) * cos(sin(z))", variable = func_var, value = 3,
-        font = ("Arial", 16), bg = "#e0e0eb", fg = "#29293d", anchor = "w").\
-        place(width = 200, height = 25, x = CANVAS_WIDTH + 80, y = 200)
+entry_x_begin = tk.Entry(font=("Calibri", 18), justify='center')
+entry_x_begin.place(width=80, height=30, x=80, y=390)
 
+entry_x_end = tk.Entry(font=("Calibri", 18), justify='center')
+entry_x_end.place(width=80, height=30, x=175, y=390)
 
+entry_x_step = tk.Entry(font=("Calibri", 18), justify='center')
+entry_x_step.place(width=80, height=30, x=280, y=390)
 
-    Label(text = "ПРЕДЕЛЫ", font = ("Arial", 16, "bold"), bg = "#7575a3",
-        fg = "white").place(width = 305, height = 25, x = CANVAS_WIDTH + 5, y = 235)
+entry_z_begin = tk.Entry(font=("Calibri", 18), justify='center')
+entry_z_begin.place(width=80, height=30, x=80, y=440)
 
-    Label(text = "Ox", font = ("Arial", 16), bg = "#e0e0eb",
-        fg = "#29293d").place(width = 20, height = 25, x = CANVAS_WIDTH + 15, y = 300)
+entry_z_end = tk.Entry(font=("Calibri", 18), justify='center')
+entry_z_end.place(width=80, height=30, x=175, y=440)
 
-    Label(text = "от\tдо\tшаг", font = ("Arial", 16), bg = "#e0e0eb",
-        fg = "#29293d").place(width = 210, height = 20, x = CANVAS_WIDTH + 70, y = 270)
+entry_z_step = tk.Entry(font=("Calibri", 18), justify='center')
+entry_z_step.place(width=80, height=30, x=280, y=440)
 
-    x_from_entry = Entry(font = ("Arial", 16))
-    x_from_entry.place(width = 80, height = 30, x = CANVAS_WIDTH + 50, y = 300)
+tk.Label(text="Масштабирование", font=("Calibri", 20, "bold")).place(width=445, height=25, y=480)
 
-    x_to_entry = Entry(font = ("Arial", 16))
-    x_to_entry.place(width = 80, height = 30, x = CANVAS_WIDTH + 130, y = 300)
+tk.Label(text="Коэффициент", font=("Calibri", 18)).place(x=50, y=510)
 
-    x_step_entry = Entry(font = ("Arial", 16))
-    x_step_entry.place(width = 80, height = 30, x = CANVAS_WIDTH + 210, y = 300)
+entry_scale = tk.Entry(font=("Calibri", 18), justify='center')
+entry_scale.place(width=120, height=30, x=250, y=515)
 
-    Label(text = "Oz", font = ("Arial", 16), bg = "#e0e0eb",
-        fg = "#29293d").place(width = 20, height = 25, x = CANVAS_WIDTH + 15, y = 340)
+tk.Button(text="Масштабировать", font=("Calibri", 18),
+          command=lambda: draw.scale_function(
+              entry_scale, main_canvas, color_var, function_var,
+              entry_x_begin, entry_x_end, entry_x_step,
+              entry_z_begin, entry_z_end, entry_z_step)).place(width=370, height=50, x=40, y=550)
 
-    z_from_entry = Entry(font = ("Arial", 16))
-    z_from_entry.place(width = 80, height = 30, x = CANVAS_WIDTH + 50, y = 340)
+tk.Label(text="Поворот", font=("Calibri", 20, "bold")).place(width=445, y=610)
 
-    z_to_entry = Entry(font = ("Arial", 16))
-    z_to_entry.place(width = 80, height = 30, x = CANVAS_WIDTH + 130, y = 340)
+tk.Label(text="Ox", font=("Calibri", 18)).place(height=30, x=25, y=670)
+tk.Label(text="Oy", font=("Calibri", 18)).place(height=30, x=25, y=725)
+tk.Label(text="Oz", font=("Calibri", 18)).place(height=30, x=25, y=780)
 
-    z_step_entry = Entry(font = ("Arial", 16))
-    z_step_entry.place(width = 80, height = 30, x = CANVAS_WIDTH + 210, y = 340)
+entry_x_rotate = tk.Entry(font=("Calibri", 18), justify='center')
+entry_x_rotate.place(width=125, height=50, x=100, y=660)
 
+entry_y_rotate = tk.Entry(font=("Calibri", 18), justify='center')
+entry_y_rotate.place(width=125, height=50, x=100, y=715)
 
+entry_z_rotate = tk.Entry(font=("Calibri", 18), justify='center')
+entry_z_rotate.place(width=125, height=50, x=100, y=770)
 
-    Label(text = "МАСШТАБИРОВАНИЕ", font = ("Arial", 16, "bold"), bg = "#7575a3",
-        fg = "white").place(width = 305, height = 25, x = CANVAS_WIDTH + 5, y = 380)
+tk.Button(text="Повернуть", font=("Calibri", 18),
+          command=lambda: draw.rotate_x(
+              entry_x_rotate, main_canvas, color_var, function_var,
+              entry_x_begin, entry_x_end, entry_x_step,
+              entry_z_begin, entry_z_end, entry_z_step)). \
+    place(width=125, height=50, x=285, y=660)
 
-    Label(text = "Коэффициент = ", font = ("Arial", 16), bg = "#e0e0eb",
-        fg = "#29293d").place(width = 150, height = 20, x = CANVAS_WIDTH + 40, y = 420)
+tk.Button(text="Повернуть", font=("Calibri", 18),
+          command=lambda: draw.rotate_y(
+              entry_y_rotate, main_canvas, color_var, function_var,
+              entry_x_begin, entry_x_end, entry_x_step,
+              entry_z_begin, entry_z_end, entry_z_step)). \
+    place(width=125, height=50, x=285, y=715)
 
-    scale_entry = Entry(font = ("Arial", 16))
-    scale_entry.place(width = 80, height = 30, x = CANVAS_WIDTH + 190, y = 415)
-    
-    Button(highlightbackground = "#7575a3", highlightthickness = 30, fg = "#e0e0eb", state = DISABLED).\
-        place(width = 268, height = 30,  x = CANVAS_WIDTH + 25, y = 450)
+tk.Button(text="Повернуть", font=("Calibri", 18),
+          command=lambda: draw.rotate_z(
+              entry_z_rotate, main_canvas, color_var, function_var,
+              entry_x_begin, entry_x_end, entry_x_step,
+              entry_z_begin, entry_z_end, entry_z_step)). \
+    place(width=125, height=50, x=285, y=770)
 
-    Button(text = "Масштабировать", font = ("Arial", 16), 
-        highlightbackground = "#d1d1e0", highlightthickness = 30, fg = "#33334d",
-        command = lambda: scale_graph(
-            scale_entry, canvas, color_var, func_var,
-            x_from_entry, x_to_entry, x_step_entry,
-            z_from_entry, z_to_entry, z_step_entry)).\
-        place(width = 264, height = 26,  x = CANVAS_WIDTH + 27, y = 452)
+tk.Button(text="Построить", font=("Calibri", 18),
+          command=lambda: draw.build_function(
+              main_canvas, color_var, function_var,
+              entry_x_begin, entry_x_end, entry_x_step,
+              entry_z_begin, entry_z_end, entry_z_step, new_graph=True)). \
+    place(width=370, height=50, x=40, y=880)
 
+tk.Button(text="Очистить экран", font=("Calibri", 18),
+          command=lambda: draw.clear_canvas(main_canvas)).place(width=370, height=50, x=40, y=935)
 
+entry_x_begin.insert(0, "-10")
+entry_x_end.insert(0, "10")
+entry_x_step.insert(0, "0.2")
 
-    Label(text = "ВРАЩЕНИЕ", font = ("Arial", 16, "bold"), bg = "#7575a3",
-        fg = "white").place(width = 305, height = 25, x = CANVAS_WIDTH + 5, y = 490)
+entry_z_begin.insert(0, "-10")
+entry_z_end.insert(0, "10")
+entry_z_step.insert(0, "0.2")
 
-    Label(text = "Ox", font = ("Arial", 16), bg = "#e0e0eb",
-        fg = "#29293d").place(width = 25, height = 30, x = CANVAS_WIDTH + 25, y = 525)
+entry_scale.insert(0, "50")
 
-    Label(text = "Oy", font = ("Arial", 16), bg = "#e0e0eb",
-        fg = "#29293d").place(width = 25, height = 30, x = CANVAS_WIDTH + 25, y = 560)
-    
-    Label(text = "Oz", font = ("Arial", 16), bg = "#e0e0eb",
-        fg = "#29293d").place(width = 25, height = 30, x = CANVAS_WIDTH + 25, y = 595)
+entry_x_rotate.insert(0, "20")
+entry_y_rotate.insert(0, "20")
+entry_z_rotate.insert(0, "20")
 
-    x_spin_entry = Entry(font = ("Arial", 16))
-    x_spin_entry.place(width = 80, height = 30, x = CANVAS_WIDTH + 70, y = 525)
-
-    y_spin_entry = Entry(font = ("Arial", 16))
-    y_spin_entry.place(width = 80, height = 30, x = CANVAS_WIDTH + 70, y = 560)
-
-    z_spin_entry = Entry(font = ("Arial", 16))
-    z_spin_entry.place(width = 80, height = 30, x = CANVAS_WIDTH + 70, y = 595)
-    
-    Button(highlightbackground = "#7575a3", highlightthickness = 30, fg = "#e0e0eb", state = DISABLED).\
-        place(width = 120, height = 30,  x = CANVAS_WIDTH + 170, y = 525)
-
-    Button(text = "Повернуть", font = ("Arial", 16), 
-        highlightbackground = "#d1d1e0", highlightthickness = 30, fg = "#33334d",
-        command = lambda: spin_x(
-            x_spin_entry, canvas, color_var, func_var,
-            x_from_entry, x_to_entry, x_step_entry,
-            z_from_entry, z_to_entry, z_step_entry)).\
-        place(width = 116, height = 26,  x = CANVAS_WIDTH + 172, y = 527)
-
-    Button(highlightbackground = "#7575a3", highlightthickness = 30, fg = "#e0e0eb", state = DISABLED).\
-        place(width = 120, height = 30,  x = CANVAS_WIDTH + 170, y = 560)
-
-    Button(text = "Повернуть", font = ("Arial", 16), 
-        highlightbackground = "#d1d1e0", highlightthickness = 30, fg = "#33334d",
-        command = lambda: spin_y(
-            y_spin_entry, canvas, color_var, func_var,
-            x_from_entry, x_to_entry, x_step_entry,
-            z_from_entry, z_to_entry, z_step_entry)).\
-        place(width = 116, height = 26,  x = CANVAS_WIDTH + 172, y = 562)
-
-    Button(highlightbackground = "#7575a3", highlightthickness = 30, fg = "#e0e0eb", state = DISABLED).\
-        place(width = 120, height = 30,  x = CANVAS_WIDTH + 170, y = 595)
-
-    Button(text = "Повернуть", font = ("Arial", 16), 
-        highlightbackground = "#d1d1e0", highlightthickness = 30, fg = "#33334d",
-        command = lambda: spin_z(
-            z_spin_entry, canvas, color_var, func_var,
-            x_from_entry, x_to_entry, x_step_entry,
-            z_from_entry, z_to_entry, z_step_entry)).\
-        place(width = 116, height = 26,  x = CANVAS_WIDTH + 172, y = 597)
-
-
-
-    Button(highlightbackground = "#7575a3", highlightthickness = 30, fg = "#e0e0eb", state = DISABLED).\
-        place(width = 268, height = 40,  x = CANVAS_WIDTH + 25, y = 635)
-
-    Button(text = "Построить", font = ("Arial", 16), 
-        highlightbackground = "#b3b3cc", highlightthickness = 30, fg = "#33334d",
-        command = lambda: build_graph(
-            canvas, color_var, func_var, 
-            x_from_entry, x_to_entry, x_step_entry,
-            z_from_entry, z_to_entry, z_step_entry, new_graph = True)).\
-        place(width = 264, height = 36,  x = CANVAS_WIDTH + 27, y = 637)
-
-    Button(highlightbackground = "#7575a3", highlightthickness = 30, fg = "#e0e0eb", state = DISABLED).\
-        place(width = 268, height = 40,  x = CANVAS_WIDTH + 25, y = 680)
-
-    Button(text = "Очистить экран", font = ("Arial", 16), 
-        highlightbackground = "#b3b3cc", highlightthickness = 30, fg = "#33334d",
-        command = lambda: clear_canvas(canvas)).\
-        place(width = 264, height = 36,  x = CANVAS_WIDTH + 27, y = 682)
-
-
-    x_from_entry.insert(0, "-10")
-    x_to_entry.insert  (0,  "10")
-    x_step_entry.insert(0, "0.2")
-
-    z_from_entry.insert(0, "-10")
-    z_to_entry.insert  (0,  "10")
-    z_step_entry.insert(0, "0.2")
-
-    scale_entry.insert(0, "43")
-    
-    x_spin_entry.insert(0, "30")
-    y_spin_entry.insert(0, "30")
-    z_spin_entry.insert(0, "30")
-
-    window.mainloop()
-
-if __name__ == "__main__":
-    main()
+main_window.mainloop()
