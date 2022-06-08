@@ -157,53 +157,6 @@ def are_sides_linked(line_0, line_1):
     return False
 
 
-def make_unique(sides):
-    for side in sides:
-        side.sort()
-
-    return list(filter(lambda x: (sides.count(x) % 2) == 1, sides))
-
-
-def is_dot_on_side(dot, side):
-    if abs(sh.vector_product(sh.get_vector(dot, side[0]), sh.get_vector(side[1], side[0]))) <= 1e-6:
-        if side[0] < dot < side[1] or side[1] < dot < side[0]:
-            return True
-
-    return False
-
-
-def get_sides(side, rest_dots):
-    dots_list = [side[0], side[1]]
-
-    for dot in rest_dots:
-        if is_dot_on_side(dot, side):
-            dots_list.append(dot)
-
-    dots_list.sort()
-
-    sections_list = list()
-
-    for i in range(len(dots_list) - 1):
-        sections_list.append([dots_list[i], dots_list[i + 1]])
-
-    return sections_list
-
-
-def remove_odd_sides(figure_dots):
-    all_sides = list()
-    rest_dots = figure_dots[2:]
-
-    for i in range(len(figure_dots)):
-        cur_side = [figure_dots[i], figure_dots[(i + 1) % len(figure_dots)]]
-
-        all_sides.extend(get_sides(cur_side, rest_dots))
-
-        rest_dots.pop(0)
-        rest_dots.append(figure_dots[i])
-
-    return make_unique(all_sides)
-
-
 def is_polygon_self_intersecting(clipper):
     clipper_list = []
 
@@ -290,7 +243,5 @@ def clip(clipper, figure, canvas, color_result_var):
 
 
 def draw_result_figure(figure_dots, canvas, result_color):
-    fixed_figure = remove_odd_sides(figure_dots)
-
-    for line in fixed_figure:
-        canvas.create_line(line[0], line[1], fill=result_color)
+    for i in range(-1, len(figure_dots)):
+        canvas.create_line(figure_dots[i], figure_dots[i - 1], fill=result_color)
